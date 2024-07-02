@@ -1,9 +1,10 @@
 interface User {
+  _id?: string;
   userName: string;
   displayName: string;
   email: string;
   password: string;
-  wallet?:Number
+  wallet?: Number;
   isBlocked?: boolean;
   isAdmin?: boolean;
 }

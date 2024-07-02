@@ -1,6 +1,7 @@
 import EncryptOtp from "../frameworks/utils/bcryptOtp";
 import EncryptPassword from "../frameworks/utils/bcryptPassword";
 import GenerateOtp from "../frameworks/utils/generateOtp";
+import JWTToken from "../frameworks/utils/generateToken";
 import sendOtp from "../frameworks/utils/sendMail";
 import UserRepository from "../repository/userRepository";
 
@@ -10,19 +11,22 @@ class UserUsecase {
   private EncryptPassword: EncryptPassword;
   private EncryptOtp: EncryptOtp;
   private GenerateMail: sendOtp;
+  private JwtToken: JWTToken;
 
   constructor(
     UserRepository: UserRepository,
     generateOtp: GenerateOtp,
     encryptPassword: EncryptPassword,
     encryptOtp: EncryptOtp,
-    generateMail: sendOtp
+    generateMail: sendOtp,
+    jwtToken: JWTToken
   ) {
     this.UserRepository = UserRepository;
     this.generateOtp = generateOtp;
     this.EncryptPassword = encryptPassword;
     this.EncryptOtp = encryptOtp;
     this.GenerateMail = generateMail;
+    this.JwtToken = jwtToken;
   }
 
   async checkExist(email: string) {
@@ -113,15 +117,18 @@ class UserUsecase {
     const isVerified = await this.EncryptOtp.compare(otp, otpData.otp);
 
     if (isVerified) {
-      await this.UserRepository.saveUser(data);
-
+      const userData = await this.UserRepository.saveUser(data);
       await this.UserRepository.deleteOtpByEmail(email);
+
+      const token = this.JwtToken.generateToken(userData._id, "user");
 
       return {
         status: 200,
         data: {
           status: true,
-          message: "Verification otp sent to your email",
+          message:
+            "Registration completed successfully. Welcome to our community!",
+          token,
         },
       };
     } else {

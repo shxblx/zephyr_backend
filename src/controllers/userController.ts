@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import UserUsecase from "../usecase/userUsecase";
+import dotenv from "dotenv";
+dotenv.config();
 
 class userController {
   private userUsecase: UserUsecase;
@@ -33,8 +35,19 @@ class userController {
     try {
       const { otp, email } = req.body;
       let verified = await this.userUsecase.verifyOtp(email, otp);
-      return res.status(verified.status).json(verified.data?.message);
-    } catch (error) {}
+
+      if (verified.status === 200 && verified.data?.token) {
+        res.cookie("jwt", verified.data.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+      }
+      return res.status(verified.status).json(verified.data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
