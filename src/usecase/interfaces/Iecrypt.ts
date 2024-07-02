@@ -1,6 +1,6 @@
-interface Encrypt{
-    encrypt(password:string|number):Promise<string>,
-    compare(password:string|number,hashedPassword:string):Promise<boolean>
+interface Encrypt {
+  encrypt(item: string | number): Promise<string>;
+  compare(item: string | number, hasheditem: string): Promise<boolean>;
 }
 
-export default Encrypt
+export default Encrypt;

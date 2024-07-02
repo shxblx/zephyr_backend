@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import UserUsecase from "../usecase/userUsecase";
+import sendOtp from "../frameworks/utils/sendMail";
 
 class userController {
   private userUsecase: UserUsecase;
@@ -18,8 +19,13 @@ class userController {
           req.body.displayName,
           req.body.password
         );
+        return res.status(user.status).json(user.data);
+      } else {
+        return res.status(verifyUser.status).json(verifyUser.data);
       }
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

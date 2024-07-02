@@ -17,7 +17,7 @@ class UserRepository implements UserRepo {
     return savedUser;
   }
 
-  async saveOtp(email: string, otp: number): Promise<any> {
+  async saveOtp(email: string, otp: string): Promise<any> {
     const otpData = new OtpModel({
       email,
       otp,
