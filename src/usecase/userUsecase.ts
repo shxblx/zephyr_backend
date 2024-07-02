@@ -53,6 +53,8 @@ class UserUsecase {
     password: string
   ) {
     const otp = this.generateOtp.createOtp();
+    console.log("OTP: " + otp);
+
     const user = {
       email,
       userName,
@@ -60,10 +62,16 @@ class UserUsecase {
       password,
     };
     const hashedOtp = await this.EncryptOtp.encrypt(otp);
+    const hashedPassword = await this.EncryptPassword.encrypt(password);
+    await this.UserRepository.saveOtp(
+      email,
+      hashedOtp,
+      userName,
+      displayName,
+      hashedPassword
+    );
 
-    await this.UserRepository.saveOtp(email, hashedOtp);
-
-    this.GenerateMail.sendMail(email, otp);
+    await this.GenerateMail.sendMail(email, otp);
 
     return {
       status: 200,
@@ -72,6 +80,53 @@ class UserUsecase {
         message: "Verification otp sent to your email",
       },
     };
+  }
+
+  async verifyOtp(email: string, otp: number) {
+    const otpData = await this.UserRepository.findOtpByEmail(email);
+
+    if (!otpData) {
+      return { status: 400, message: "Invalid or expired OTP" };
+    }
+
+    const data: {
+      userName: string;
+      displayName: string;
+      password: string;
+      email: string;
+    } = {
+      userName: otpData.userName,
+      displayName: otpData.displayName,
+      password: otpData.password,
+      email: otpData.email,
+    };
+
+    const now = new Date().getTime();
+    const otpGeneratedAt = new Date(otpData.otpGeneratedAt).getTime();
+    const otpExpiration = 1 * 60 * 1000;
+
+    if (now - otpGeneratedAt > otpExpiration) {
+      await this.UserRepository.deleteOtpByEmail(email);
+      return { status: 400, message: "OTP has expired" };
+    }
+
+    const isVerified = await this.EncryptOtp.compare(otp, otpData.otp);
+
+    if (isVerified) {
+      await this.UserRepository.saveUser(data);
+
+      await this.UserRepository.deleteOtpByEmail(email);
+
+      return {
+        status: 200,
+        data: {
+          status: true,
+          message: "Verification otp sent to your email",
+        },
+      };
+    } else {
+      return { status: 400, message: "Incorrect OTP" };
+    }
   }
 }
 

@@ -14,13 +14,13 @@ const userSchema: Schema<User & Document> = new Schema({
     type: String,
     required: true,
   },
-  isVerified: {
-    type: Boolean,
-    default: false,
+  password: {
+    type: String,
+    required: true,
   },
-  wallet:{
-    type:Number,
-    default:0
+  wallet: {
+    type: Number,
+    default: 0,
   },
   isBlocked: {
     type: Boolean,

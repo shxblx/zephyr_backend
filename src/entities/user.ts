@@ -5,7 +5,6 @@ interface User {
   password: string;
   wallet?:Number
   isBlocked?: boolean;
-  isVerified?: boolean;
   isAdmin?: boolean;
 }
 

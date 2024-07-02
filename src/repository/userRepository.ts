@@ -12,21 +12,52 @@ class UserRepository implements UserRepo {
 
   async saveUser(user: User): Promise<User> {
     const newUser = new UserModel(user);
+    console.log(newUser);
+
     const savedUser = await newUser.save();
 
     return savedUser;
   }
 
-  async saveOtp(email: string, otp: string): Promise<any> {
-    const otpData = new OtpModel({
+  async saveOtp(
+    email: string,
+    otp: string,
+    userName: string,
+    displayName: string,
+    password: string
+  ): Promise<any> {
+    const filter = { email };
+    const update = {
       email,
       otp,
+      userName,
+      displayName,
+      password,
       otpGeneratedAt: new Date(),
-    });
+    };
+    const options = {
+      upsert: true,
+      new: true,
+      setDefaultsOnInsert: true,
+    };
+    try {
+      const savedOtp = await OtpModel.findOneAndUpdate(
+        filter,
+        update,
+        options
+      ).exec();
+      return savedOtp;
+    } catch (error) {
+      throw new Error("Failed to save OTP.");
+    }
+  }
 
-    const savedOtp = await otpData.save();
+  async findOtpByEmail(email: string): Promise<any> {
+    return OtpModel.findOne({ email });
+  }
 
-    return savedOtp;
+  async deleteOtpByEmail(email: string): Promise<any> {
+    return OtpModel.deleteOne({ email });
   }
 }
 

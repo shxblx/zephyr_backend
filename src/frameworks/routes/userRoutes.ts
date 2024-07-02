@@ -34,4 +34,8 @@ userRouter.post("/signup", (req, res, next) =>
   userController.signUp(req, res, next)
 );
 
+userRouter.post("/verifyOtp", (req, res, next) =>
+  userController.verifyOtp(req, res, next)
+);
+
 export default userRouter;
