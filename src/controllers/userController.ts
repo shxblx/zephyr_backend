@@ -13,6 +13,7 @@ class userController {
   async signUp(req: Request, res: Response, next: NextFunction) {
     try {
       const verifyUser = await this.userUsecase.checkExist(req.body.email);
+      console.log(verifyUser);
 
       if (verifyUser.data.status === true) {
         const user = await this.userUsecase.signup(
@@ -45,7 +46,7 @@ class userController {
       }
       return res.status(verified.status).json(verified.data);
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   }
 }
