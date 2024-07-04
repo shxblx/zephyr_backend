@@ -59,6 +59,10 @@ class UserRepository implements UserRepo {
   async deleteOtpByEmail(email: string): Promise<any> {
     return OtpModel.deleteOne({ email });
   }
+
+  async findUser(email: string): Promise<User | null> {
+    return UserModel.findOne({ email: email });
+  }
 }
 
 export default UserRepository;

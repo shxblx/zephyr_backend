@@ -41,4 +41,12 @@ userRouter.post("/verifyOtp", (req, res, next) =>
   userController.verifyOtp(req, res, next)
 );
 
+userRouter.post("/login", (req, res, next) => {
+  userController.login(req, res, next);
+});
+
+userRouter.post("/logout", (req, res, next)=>{
+  userController.logout(req,res,next)
+});
+
 export default userRouter;

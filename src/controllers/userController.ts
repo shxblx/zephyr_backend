@@ -13,7 +13,6 @@ class userController {
   async signUp(req: Request, res: Response, next: NextFunction) {
     try {
       const verifyUser = await this.userUsecase.checkExist(req.body.email);
-      console.log(verifyUser);
 
       if (verifyUser.data.status === true) {
         const user = await this.userUsecase.signup(
@@ -44,7 +43,43 @@ class userController {
           sameSite: "strict",
         });
       }
-      return res.status(verified.status).json(verified.data);
+      console.log(verified.message);
+      return res.status(verified.status).json(verified.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async login(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, password } = req.body;
+      const loginVerified = await this.userUsecase.verifyUser(email, password);
+      if (loginVerified.data?.status === true) {
+        res.cookie("jwt", loginVerified?.data.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+
+        return res.status(loginVerified.status).json(loginVerified.data);
+      }
+      return res.status(loginVerified.status).json(loginVerified.message);
+    } catch (error) {}
+  }
+
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      res.cookie("jwt", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development",
+        expires: new Date(0),
+        sameSite: "strict",
+      });
+
+      return res
+        .status(200)
+        .json({ status: true, message: "Logout successful" });
     } catch (error) {
       next(error);
     }

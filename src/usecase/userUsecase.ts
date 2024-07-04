@@ -88,7 +88,7 @@ class UserUsecase {
 
   async verifyOtp(email: string, otp: number) {
     const otpData = await this.UserRepository.findOtpByEmail(email);
-
+    console.log(otpData);
     if (!otpData) {
       return { status: 400, message: "Invalid or expired OTP" };
     }
@@ -126,14 +126,50 @@ class UserUsecase {
         status: 200,
         data: {
           status: true,
-          message:
-            "Registration completed successfully. Welcome to our community!",
+          message: "Welcome to our community!",
           token,
         },
       };
     } else {
       return { status: 400, message: "Incorrect OTP" };
     }
+  }
+
+  async verifyUser(email: string, password: string) {
+    const isVerified = await this.UserRepository.findByEmail(email);
+
+    if (!isVerified) {
+      return {
+        status: 400,
+        message: "User doesn't exist",
+      };
+    }
+    const passwordVerified = await this.EncryptPassword.compare(
+      password,
+      isVerified?.password
+    );
+
+    const token = this.JwtToken.generateToken(isVerified._id, "user");
+    if (passwordVerified === false) {
+      return {
+        status: 400,
+        message: "Wrong password",
+      };
+    }
+    const userData = {
+      userName: isVerified.userName,
+      displayName: isVerified.displayName,
+      email: isVerified.email,
+    };
+    return {
+      status: 200,
+      data: {
+        userData,
+        status: true,
+        message: "Login successful. Welcome back!",
+        token,
+      },
+    };
   }
 }
 
