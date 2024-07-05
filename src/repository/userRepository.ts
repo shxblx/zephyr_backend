@@ -2,7 +2,7 @@ import Otp from "../entities/otp";
 import User from "../entities/user";
 import OtpModel from "../frameworks/models/otpModel";
 import UserModel from "../frameworks/models/userModel";
-import UserRepo from "../usecase/interfaces/IuserRepo";
+import UserRepo from "../usecase/interfaces/user/IuserRepo";
 
 class UserRepository implements UserRepo {
   async findByEmail(email: string): Promise<User | null> {

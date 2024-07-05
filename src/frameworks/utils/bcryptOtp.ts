@@ -1,4 +1,4 @@
-import Encrypt from "../../usecase/interfaces/Iecrypt";
+import Encrypt from "../../usecase/interfaces/user/Iencrypt";
 import bcrypt from "bcrypt";
 
 class EncryptOtp implements Encrypt {

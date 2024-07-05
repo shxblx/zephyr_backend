@@ -1,4 +1,4 @@
-import OTP from "../../usecase/interfaces/Iotp";
+import OTP from "../../usecase/interfaces/user/Iotp";
 
 class GenerateOtp implements OTP {
   createOtp(): number {

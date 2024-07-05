@@ -1,4 +1,4 @@
-import Nodemailer from "../../usecase/interfaces/Inodemailer";
+import Nodemailer from "../../usecase/interfaces/user/Inodemailer";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();

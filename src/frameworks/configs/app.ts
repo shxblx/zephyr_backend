@@ -17,6 +17,7 @@ app.use(
 );
 
 app.use("/user", userRouter);
+app.use("/admin", userRouter);
 
 app.use(express.urlencoded({ extended: true }));
 
