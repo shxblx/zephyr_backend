@@ -14,3 +14,9 @@ const adminRepository = new AdminRepository();
 const adminCase = new AdminUsecase(adminRepository);
 
 const adminController = new AdminController(adminCase);
+
+adminRouter.post("/login", (req, res, next) => {
+  adminController.adminLogin(req, res, next);
+});
+
+export default adminRouter;
