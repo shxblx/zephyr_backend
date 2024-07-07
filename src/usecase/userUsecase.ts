@@ -6,12 +6,12 @@ import sendOtp from "../frameworks/utils/sendMail";
 import UserRepository from "../repository/userRepository";
 
 class UserUsecase {
-  private UserRepository: UserRepository;
-  private generateOtp: GenerateOtp;
-  private EncryptPassword: EncryptPassword;
-  private EncryptOtp: EncryptOtp;
-  private GenerateMail: sendOtp;
-  private JwtToken: JWTToken;
+  private _userRepository: UserRepository;
+  private _generateOtp: GenerateOtp;
+  private _encryptPassword: EncryptPassword;
+  private _encryptOtp: EncryptOtp;
+  private _generateMail: sendOtp;
+  private _jwtToken: JWTToken;
 
   constructor(
     UserRepository: UserRepository,
@@ -21,16 +21,16 @@ class UserUsecase {
     generateMail: sendOtp,
     jwtToken: JWTToken
   ) {
-    this.UserRepository = UserRepository;
-    this.generateOtp = generateOtp;
-    this.EncryptPassword = encryptPassword;
-    this.EncryptOtp = encryptOtp;
-    this.GenerateMail = generateMail;
-    this.JwtToken = jwtToken;
+    this._userRepository = UserRepository;
+    this._generateOtp = generateOtp;
+    this._encryptPassword = encryptPassword;
+    this._encryptOtp = encryptOtp;
+    this._generateMail = generateMail;
+    this._jwtToken = jwtToken;
   }
 
   async checkExist(email: string) {
-    const userExist = await this.UserRepository.findByEmail(email);
+    const userExist = await this._userRepository.findByEmail(email);
     if (userExist) {
       return {
         status: 400,
@@ -56,7 +56,7 @@ class UserUsecase {
     displayName: string,
     password: string
   ) {
-    const otp = this.generateOtp.createOtp();
+    const otp = this._generateOtp.createOtp();
     console.log("OTP: " + otp);
 
     const user = {
@@ -65,9 +65,9 @@ class UserUsecase {
       displayName,
       password,
     };
-    const hashedOtp = await this.EncryptOtp.encrypt(otp);
-    const hashedPassword = await this.EncryptPassword.encrypt(password);
-    await this.UserRepository.saveOtp(
+    const hashedOtp = await this._encryptOtp.encrypt(otp);
+    const hashedPassword = await this._encryptPassword.encrypt(password);
+    await this._userRepository.saveOtp(
       email,
       hashedOtp,
       userName,
@@ -75,7 +75,7 @@ class UserUsecase {
       hashedPassword
     );
 
-    await this.GenerateMail.sendMail(email, otp);
+    await this._generateMail.sendMail(email, otp);
 
     return {
       status: 200,
@@ -87,7 +87,7 @@ class UserUsecase {
   }
 
   async verifyOtp(email: string, otp: number) {
-    const otpData = await this.UserRepository.findOtpByEmail(email);
+    const otpData = await this._userRepository.findOtpByEmail(email);
     if (!otpData) {
       return { status: 400, message: "Invalid or expired OTP" };
     }
@@ -109,17 +109,17 @@ class UserUsecase {
     const otpExpiration = 1 * 60 * 1000;
 
     if (now - otpGeneratedAt > otpExpiration) {
-      await this.UserRepository.deleteOtpByEmail(email);
+      await this._userRepository.deleteOtpByEmail(email);
       return { status: 400, message: "OTP has expired" };
     }
 
-    const isVerified = await this.EncryptOtp.compare(otp, otpData.otp);
+    const isVerified = await this._encryptOtp.compare(otp, otpData.otp);
 
     if (isVerified) {
-      const userData = await this.UserRepository.saveUser(data);
-      await this.UserRepository.deleteOtpByEmail(email);
+      const userData = await this._userRepository.saveUser(data);
+      await this._userRepository.deleteOtpByEmail(email);
 
-      const token = this.JwtToken.generateToken(userData._id, "user");
+      const token = this._jwtToken.generateToken(userData._id, "user");
 
       return {
         status: 200,
@@ -136,7 +136,7 @@ class UserUsecase {
   }
 
   async verifyUser(email: string, password: string) {
-    const isVerified = await this.UserRepository.findByEmail(email);
+    const isVerified = await this._userRepository.findByEmail(email);
 
     if (!isVerified) {
       return {
@@ -144,12 +144,12 @@ class UserUsecase {
         message: "User doesn't exist",
       };
     }
-    const passwordVerified = await this.EncryptPassword.compare(
+    const passwordVerified = await this._encryptPassword.compare(
       password,
       isVerified?.password
     );
 
-    const token = this.JwtToken.generateToken(isVerified._id, "user");
+    const token = this._jwtToken.generateToken(isVerified._id, "user");
     if (passwordVerified === false) {
       return {
         status: 400,

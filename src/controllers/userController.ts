@@ -3,19 +3,19 @@ import UserUsecase from "../usecase/userUsecase";
 import dotenv from "dotenv";
 dotenv.config();
 
-class userController {
-  private userUsecase: UserUsecase;
+class UserController {
+  private _userUsecase: UserUsecase;
 
   constructor(userUsecase: UserUsecase) {
-    this.userUsecase = userUsecase;
+    this._userUsecase = userUsecase;
   }
 
   async signUp(req: Request, res: Response, next: NextFunction) {
     try {
-      const verifyUser = await this.userUsecase.checkExist(req.body.email);
+      const verifyUser = await this._userUsecase.checkExist(req.body.email);
 
       if (verifyUser.data.status === true) {
-        const user = await this.userUsecase.signup(
+        const user = await this._userUsecase.signup(
           req.body.email,
           req.body.userName,
           req.body.displayName,
@@ -33,7 +33,7 @@ class userController {
   async verifyOtp(req: Request, res: Response, next: NextFunction) {
     try {
       const { otp, email } = req.body;
-      let verified = await this.userUsecase.verifyOtp(email, otp);
+      let verified = await this._userUsecase.verifyOtp(email, otp);
 
       if (verified.status === 200 && verified.data?.token) {
         res.cookie("jwt", verified.data.token, {
@@ -53,7 +53,7 @@ class userController {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
-      const loginVerified = await this.userUsecase.verifyUser(email, password);
+      const loginVerified = await this._userUsecase.verifyUser(email, password);
       if (loginVerified.data?.status === true) {
         res.cookie("jwt", loginVerified?.data.token, {
           httpOnly: true,
@@ -86,4 +86,4 @@ class userController {
   }
 }
 
-export default userController;
+export default UserController;

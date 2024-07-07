@@ -3,22 +3,22 @@ import JWTToken from "../frameworks/utils/generateToken";
 import AdminRepository from "../repository/adminRepository";
 
 class AdminUsecase {
-  private AdminRepository: AdminRepository;
-  private encryptPassword: EncryptPassword;
-  private jwtToken: JWTToken;
+  private _adminRepository: AdminRepository;
+  private _encryptPassword: EncryptPassword;
+  private _jwtToken: JWTToken;
 
   constructor(
     AdminRepository: AdminRepository,
     encryptPassword: EncryptPassword,
     jwtToken: JWTToken
   ) {
-    this.AdminRepository = AdminRepository;
-    this.encryptPassword = encryptPassword;
-    this.jwtToken = jwtToken;
+    this._adminRepository = AdminRepository;
+    this._encryptPassword = encryptPassword;
+    this._jwtToken = jwtToken;
   }
 
   async verifyAdmin(email: string, password: string) {
-    const adminData = await this.AdminRepository.findAdmin(email);
+    const adminData = await this._adminRepository.findAdmin(email);
 
     if (!adminData || adminData.isAdmin === false) {
       return {
@@ -29,7 +29,7 @@ class AdminUsecase {
         },
       };
     }
-    const passwordMatch = await this.encryptPassword.compare(
+    const passwordMatch = await this._encryptPassword.compare(
       password,
       adminData?.password
     );
@@ -43,7 +43,7 @@ class AdminUsecase {
         },
       };
     }
-    const token = this.jwtToken.generateToken(adminData._id, "admin");
+    const token = this._jwtToken.generateToken(adminData._id, "admin");
     return {
       status: 200,
       isAdmin: true,
@@ -52,7 +52,7 @@ class AdminUsecase {
   }
 
   async getUserData() {
-    const usersData = await this.AdminRepository.getUsers();
+    const usersData = await this._adminRepository.getUsers();
 
     if (usersData) {
       return {

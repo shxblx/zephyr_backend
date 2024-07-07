@@ -4,9 +4,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 class sendOtp implements Nodemailer {
-  private transporter: nodemailer.Transporter;
+  private _transporter: nodemailer.Transporter;
   constructor() {
-    this.transporter = nodemailer.createTransport({
+    this._transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: "zephyrforgamer@gmail.com",
@@ -34,7 +34,7 @@ class sendOtp implements Nodemailer {
       `,
     };
 
-    this.transporter.sendMail(mailOptions, (err) => {
+    this._transporter.sendMail(mailOptions, (err) => {
       if (err) {
         console.log(err);
       } else {

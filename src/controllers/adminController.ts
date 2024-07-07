@@ -2,15 +2,15 @@ import { Request, Response, NextFunction } from "express";
 import AdminUsecase from "../usecase/adminUsecase";
 
 class AdminController {
-  private adminUsecase: AdminUsecase;
+  private _adminUsecase: AdminUsecase;
 
   constructor(adminUsecase: AdminUsecase) {
-    this.adminUsecase = adminUsecase;
+    this._adminUsecase = adminUsecase;
   }
 
   async adminLogin(req: Request, res: Response, next: NextFunction) {
     try {
-      const isAdmin = await this.adminUsecase.verifyAdmin(
+      const isAdmin = await this._adminUsecase.verifyAdmin(
         req.body.email,
         req.body.password
       );
@@ -35,7 +35,7 @@ class AdminController {
 
   async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      const userData = await this.adminUsecase.getUserData();
+      const userData = await this._adminUsecase.getUserData();
 
       if (userData?.status === 200) {
         return res.status(userData.status).json(userData);
