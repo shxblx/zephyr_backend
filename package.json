@@ -22,15 +22,17 @@
     "mongoose": "^8.4.3",
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.4",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.2"
+    "ts-node-dev": "^2.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.6.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
-    "eslint": "^9.6.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "eslint": "^8.57.0",
     "globals": "^15.8.0",
+    "typescript": "^5.5.3",
     "typescript-eslint": "^7.15.0"
   }
 }
