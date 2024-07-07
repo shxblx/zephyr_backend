@@ -43,8 +43,8 @@ class userController {
           sameSite: "strict",
         });
       }
-      console.log(verified.message);
-      return res.status(verified.status).json(verified.message);
+
+      return res.status(verified.status).json(verified.data?.userData);
     } catch (error) {
       next(error);
     }

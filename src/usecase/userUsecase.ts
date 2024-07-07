@@ -88,7 +88,6 @@ class UserUsecase {
 
   async verifyOtp(email: string, otp: number) {
     const otpData = await this.UserRepository.findOtpByEmail(email);
-    console.log(otpData);
     if (!otpData) {
       return { status: 400, message: "Invalid or expired OTP" };
     }
@@ -126,6 +125,7 @@ class UserUsecase {
         status: 200,
         data: {
           status: true,
+          userData,
           message: "Welcome to our community!",
           token,
         },

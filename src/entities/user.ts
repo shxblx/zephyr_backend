@@ -5,6 +5,8 @@ interface User {
   email: string;
   password: string;
   wallet?: Number;
+  profilePicture?: string;
+  isPremium?: boolean;
   isBlocked?: boolean;
   isAdmin?: boolean;
 }
