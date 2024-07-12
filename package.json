@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "nodemon"
@@ -34,5 +33,6 @@
     "globals": "^15.8.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^7.15.0"
-  }
+  },
+  "description": ""
 }

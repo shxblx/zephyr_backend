@@ -44,7 +44,20 @@ class UserController {
         });
       }
 
-      return res.status(verified.status).json(verified.data?.userData);
+      return res.status(verified.status).json(verified.data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resendOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+      const otpSend = await this._userUsecase.resendOtp(req.body.email);
+
+      if (otpSend.status === 200) {
+        return res.status(otpSend.status).json(otpSend.data);
+      }
+      return res.status(otpSend.status).json(otpSend.data);
     } catch (error) {
       next(error);
     }
@@ -65,7 +78,9 @@ class UserController {
         return res.status(loginVerified.status).json(loginVerified.data);
       }
       return res.status(loginVerified.status).json(loginVerified.message);
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
   }
 
   async logout(req: Request, res: Response, next: NextFunction) {
@@ -83,6 +98,24 @@ class UserController {
     } catch (error) {
       next(error);
     }
+  }
+
+  async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const otpSent = await this._userUsecase.resendOtp(req.body.email);
+      return res.status(otpSent.status).json(otpSent.data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async forgotVerify(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { otp, email } = req.body;
+      console.log(req.body);
+
+      const isVerified = await this._userUsecase.verifyForgot(email, otp);
+    } catch (error) {}
   }
 }
 

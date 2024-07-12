@@ -21,24 +21,26 @@ class UserRepository implements UserRepo {
   async saveOtp(
     email: string,
     otp: string,
-    userName: string,
-    displayName: string,
-    password: string
+    userName?: string,
+    displayName?: string,
+    password?: string
   ): Promise<any> {
     const filter = { email };
-    const update = {
+    const update: any = {
       email,
       otp,
-      userName,
-      displayName,
-      password,
       otpGeneratedAt: new Date(),
+      ...(userName && { userName }),
+      ...(displayName && { displayName }),
+      ...(password && { password }),
     };
+
     const options = {
       upsert: true,
       new: true,
       setDefaultsOnInsert: true,
     };
+
     try {
       const savedOtp = await OtpModel.findOneAndUpdate(
         filter,

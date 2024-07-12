@@ -4,6 +4,7 @@ import AdminUsecase from "../../usecase/adminUsecase";
 import AdminController from "../../controllers/adminController";
 import EncryptPassword from "../utils/bcryptPassword";
 import JWTToken from "../utils/generateToken";
+import errorHandle from "../middlewares/errorHandle";
 
 const adminRouter = express.Router();
 
@@ -26,5 +27,7 @@ adminRouter.post("/login", (req, res, next) => {
 adminRouter.get("/getUsers", (req, res, next) => {
   adminController.getUsers(req, res, next);
 });
+
+adminRouter.use(errorHandle);
 
 export default adminRouter;

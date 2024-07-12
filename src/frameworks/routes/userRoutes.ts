@@ -7,6 +7,7 @@ import EncryptPassword from "../utils/bcryptPassword";
 import EncryptOtp from "../utils/bcryptOtp";
 import sendOtp from "../utils/sendMail";
 import JWTToken from "../utils/generateToken";
+import errorHandle from "../middlewares/errorHandle";
 
 const userRouter = express.Router();
 
@@ -33,20 +34,34 @@ const userCase = new UserUsecase(
 //controllers
 const userController = new UserController(userCase);
 
-userRouter.post("/signup", (req, res, next) =>
-  userController.signUp(req, res, next)
-);
+userRouter.post("/signup", (req, res, next) => {
+  userController.signUp(req, res, next);
+});
 
-userRouter.post("/verifyOtp", (req, res, next) =>
-  userController.verifyOtp(req, res, next)
-);
+userRouter.post("/verifyOtp", (req, res, next) => {
+  userController.verifyOtp(req, res, next);
+});
+
+userRouter.post("/resendOtp", (req, res, next) => {
+  userController.resendOtp(req, res, next);
+});
 
 userRouter.post("/login", (req, res, next) => {
   userController.login(req, res, next);
 });
 
-userRouter.post("/logout", (req, res, next)=>{
-  userController.logout(req,res,next)
+userRouter.post("/logout", (req, res, next) => {
+  userController.logout(req, res, next);
 });
+
+userRouter.post("/forgotPassword", (req, res, next) => {
+  userController.forgotPassword(req, res, next);
+});
+
+userRouter.post("/forgotVerify", (req, res, next) => {
+  userController.forgotVerify(req, res, next);
+});
+
+userRouter.use(errorHandle);
 
 export default userRouter;
