@@ -34,11 +34,9 @@ class UserController {
     try {
       const { otp, email } = req.body;
       let verified = await this._userUsecase.verifyOtp(email, otp);
-      console.log(verified);
 
 
       if (verified.status === 200 && verified.data?.token) {
-        console.log("here");
 
         res.cookie("jwt", verified.data.token, {
           httpOnly: true,
@@ -61,8 +59,6 @@ class UserController {
       if (otpSend.status === 200) {
         return res.status(otpSend.status).json(otpSend.data);
       }
-      console.log(otpSend);
-
       return res.status(otpSend.status).json(otpSend.message);
     } catch (error) {
       next(error);
