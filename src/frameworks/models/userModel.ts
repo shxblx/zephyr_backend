@@ -22,6 +22,11 @@ const userSchema: Schema<User & Document> = new Schema({
     type: Number,
     default: 0,
   },
+  status: {
+    type: String,
+    enum: ["Online", "Idle", "Do not Disturb"],
+    default: "Online",
+  },
   profilePicture: {
     type: String,
     default:
@@ -34,6 +39,10 @@ const userSchema: Schema<User & Document> = new Schema({
   isAdmin: {
     type: Boolean,
     default: false,
+  },
+  joined_date: {
+    type: Date,
+    default: Date.now, // Removed the function call to Date.now()
   },
 });
 

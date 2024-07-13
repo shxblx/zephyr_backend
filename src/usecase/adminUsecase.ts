@@ -60,13 +60,58 @@ class AdminUsecase {
         data: usersData.users,
         total: usersData.total,
       };
-    }else{
-      return{
-        status:400,
-        message:"Failed to retrieve data"
+    } else {
+      return {
+        status: 400,
+        message: "Failed to retrieve data"
       }
     }
   }
+
+  async blockUser(userId: string) {
+    try {
+      const user = await this._adminRepository.findById(userId);
+      if (user) {
+        user.isBlocked = true;
+        await this._adminRepository.saveUser(user);
+        return {
+          status: 200,
+        };
+      } else {
+        return {
+          status: 404,
+        };
+      }
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      return {
+        status: 500,
+      };
+    }
+  }
+
+  async unblockUser(userId: string) {
+    try {
+      const user = await this._adminRepository.findById(userId)
+      if (user) {
+        user.isBlocked = false;
+        await this._adminRepository.saveUser(user);
+        return {
+          status: 200,
+        };
+      } else {
+        return {
+          status: 404,
+        };
+      }
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      return {
+        status: 500,
+      };
+    }
+  }
+
 }
 
 export default AdminUsecase;

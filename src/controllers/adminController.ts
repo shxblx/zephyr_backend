@@ -46,6 +46,26 @@ class AdminController {
       next(error);
     }
   }
+
+  async blockUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userBlocked = await this._adminUsecase.blockUser(req.body.userId);
+      return res.sendStatus(userBlocked.status);
+    } catch (error) {
+      console.error("Error in blockUser route:", error);
+      return res.sendStatus(500);
+    }
+  }
+
+  async unBlockUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userUnblocked = await this._adminUsecase.unblockUser(req.body.userId)
+      return res.sendStatus(userUnblocked.status)
+    } catch (error) {
+      console.error("Error in Unblock route", error)
+      res.sendStatus(500)
+    }
+  }
 }
 
 export default AdminController;

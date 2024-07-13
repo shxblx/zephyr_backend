@@ -35,26 +35,18 @@ class UserUsecase {
       if (userExist) {
         return {
           status: 400,
-          data: {
-            status: false,
-            message: "User already exist",
-          },
+          message: "User already exist",
         };
       } else {
         return {
           status: 200,
-          data: {
-            status: true,
-            message: "User does not exist",
-          },
+          message: "User does not exist",
         };
       }
     } catch (error) {
       return {
         status: 400,
-        data: {
-          message: "An error occurred",
-        },
+        message: "An error occurred",
       };
     }
   }
@@ -89,17 +81,12 @@ class UserUsecase {
 
       return {
         status: 200,
-        data: {
-          status: true,
-          message: "Verification otp sent to your email",
-        },
+        message: "Verification otp sent to your email",
       };
     } catch (error) {
       return {
         status: 400,
-        data: {
-          message: "An error occurred",
-        },
+        message: "An error occurred",
       };
     }
   }
@@ -107,7 +94,6 @@ class UserUsecase {
   async verifyOtp(email: string, otp: number) {
     try {
       const otpData = await this._userRepository.findOtpByEmail(email);
-      console.log(otpData);
 
       if (!otpData) {
         return { status: 400, message: "Invalid or expired OTP" };
@@ -144,58 +130,68 @@ class UserUsecase {
         return {
           status: 200,
           data: {
-            status: true,
             userData,
-            message: "Welcome to our community!",
+            message: "Welcome to our Zephyr!",
             token,
           },
         };
       } else {
-        return {
-          status: 400,
-          data: {
-            message: "Incorrect OTP",
-          },
-        };
+        return { status: 400, message: "Incorrect OTP" };
       }
     } catch (error) {
       return {
         status: 400,
-        data: {
-          message: "An error occurred",
-        },
+        message: "An error occurred",
       };
     }
   }
 
   async resendOtp(email: string) {
-    if (!email) {
-      return {
-        status: 400,
-        data: {
-          message: "Email is required",
-        },
-      };
-    }
 
     try {
-      const newOtp = await this._generateOtp.createOtp();
+      const newOtp = this._generateOtp.createOtp();
       console.log("New OTP:" + newOtp);
-      await this._generateMail.sendMail(email, newOtp);
+      this._generateMail.sendMail(email, newOtp);
+      let user = await this._userRepository.findByEmail(email)
+      if (!user) {
+        user = await this._userRepository.findOtpByEmail(email)
+      }
+
+      let userData: {
+        userName: string;
+        displayName: string;
+        profile: string | null;
+        status: "Online" | "Idle" | "Do not Disturb";
+        joined_date: Date | null;
+      } | null = null;
+
+      if (user) {
+        userData = {
+          userName: user.userName,
+          displayName: user.displayName,
+          profile: user.profilePicture || null,
+          status: user.status || "Online",
+          joined_date: user.joined_date || null,
+        };
+      }
+
+
+
+
       const hashedOtp = await this._encryptOtp.encrypt(newOtp);
+
       await this._userRepository.saveOtp(email, hashedOtp);
       return {
         status: 200,
         data: {
+          userData,
           message: "OTP has been sent to your email",
         },
       };
     } catch (error) {
       return {
         status: 400,
-        data: {
-          message: "An error occurred",
-        },
+        message: "An error occurred",
       };
     }
   }
@@ -203,6 +199,25 @@ class UserUsecase {
   async verifyUser(email: string, password: string) {
     try {
       const isVerified = await this._userRepository.findByEmail(email);
+
+      let userData: {
+        userName: string;
+        displayName: string;
+        profile: string | null;
+        status: "Online" | "Idle" | "Do not Disturb";
+        joined_date: Date | null;
+      } | null = null;
+
+      if (isVerified) {
+        userData = {
+          userName: isVerified.userName,
+          displayName: isVerified.displayName,
+          profile: isVerified.profilePicture || null,
+          status: isVerified.status || "Online",
+          joined_date: isVerified.joined_date || null,
+        };
+      }
+
 
       if (!isVerified) {
         return {
@@ -215,23 +230,18 @@ class UserUsecase {
         isVerified?.password
       );
 
+
       const token = this._jwtToken.generateToken(isVerified._id, "user");
       if (passwordVerified === false) {
         return {
           status: 400,
           message: "Wrong password",
         };
-      }
-      const userData = {
-        userName: isVerified.userName,
-        displayName: isVerified.displayName,
-        email: isVerified.email,
       };
       return {
         status: 200,
         data: {
           userData,
-          status: true,
           message: "Login successful. Welcome back!",
           token,
         },
@@ -239,23 +249,45 @@ class UserUsecase {
     } catch (error) {
       return {
         status: 400,
-        data: {
-          message: "An error occurred",
-        },
+        message: "An error occurred",
       };
     }
   }
 
   async verifyForgot(email: string, otp: number) {
     try {
-      const userData = this._userRepository.findUser(email);
-      
+      const otpData = await this._userRepository.findOtpByEmail(email);
+      const otpVerified = await this._encryptOtp.compare(otp, otpData.otp);
+
+      const now = new Date().getTime();
+      const otpGeneratedAt = new Date(otpData.otpGeneratedAt).getTime();
+      const otpExpiration = 1 * 60 * 1000;
+
+      if (now - otpGeneratedAt > otpExpiration) {
+        await this._userRepository.deleteOtpByEmail(email);
+        return {
+          status: 400,
+          message: "OTP has expired",
+        };
+      }
+
+      if (otpVerified) {
+        return {
+          status: 200,
+          data: {
+            message: "OTP Successfully verified",
+          }
+        };
+      } else {
+        return {
+          status: 400,
+          message: "Incorrect OTP",
+        };
+      }
     } catch (error) {
       return {
         status: 400,
-        data: {
-          message: "An error occurred",
-        },
+        message: "An error occurred",
       };
     }
   }

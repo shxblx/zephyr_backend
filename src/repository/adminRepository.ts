@@ -13,6 +13,17 @@ class AdminRepository implements AdminRepo {
     const total = await UserModel.countDocuments();
     return { users, total };
   }
+
+  async findById(userId: string): Promise<User | null> {
+    const userData = await UserModel.findOne({ _id: userId })
+    return userData
+  }
+
+  async saveUser(user: User): Promise<User> {
+    const newUser = new UserModel(user);
+    const savedUser = await newUser.save();
+    return savedUser;
+  }
 }
 
 export default AdminRepository;

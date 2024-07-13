@@ -28,6 +28,14 @@ adminRouter.get("/getUsers", (req, res, next) => {
   adminController.getUsers(req, res, next);
 });
 
+adminRouter.post("/blockUser", (req, res, next) => {
+  adminController.blockUser(req, res, next)
+})
+
+adminRouter.post("/unblockUser", (req, res, next) => {
+  adminController.unBlockUser(req, res, next);
+})
+
 adminRouter.use(errorHandle);
 
 export default adminRouter;

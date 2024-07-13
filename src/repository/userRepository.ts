@@ -10,6 +10,8 @@ class UserRepository implements UserRepo {
     return userData;
   }
 
+  
+
   async saveUser(user: User): Promise<User> {
     const newUser = new UserModel(user);
 
@@ -61,9 +63,6 @@ class UserRepository implements UserRepo {
     return OtpModel.deleteOne({ email });
   }
 
-  async findUser(email: string): Promise<User | null> {
-    return UserModel.findOne({ email: email });
-  }
 }
 
 export default UserRepository;

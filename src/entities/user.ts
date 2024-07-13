@@ -4,11 +4,13 @@ interface User {
   displayName: string;
   email: string;
   password: string;
-  wallet?: Number;
+  wallet?: number; 
+  status?: "Online" | "Do not Disturb" | "Idle"; 
   profilePicture?: string;
   isPremium?: boolean;
   isBlocked?: boolean;
   isAdmin?: boolean;
+  joined_date?: Date;
 }
 
 export default User;
