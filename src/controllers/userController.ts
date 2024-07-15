@@ -33,6 +33,7 @@ class UserController {
   async verifyOtp(req: Request, res: Response, next: NextFunction) {
     try {
       const { otp, email } = req.body;
+
       let verified = await this._userUsecase.verifyOtp(email, otp);
 
 
@@ -124,10 +125,12 @@ class UserController {
     try {
       const { otp, email } = req.body;
 
+
       if (!otp || !email) {
         return res.status(400).json({ message: "OTP and email are required" });
       }
       const isVerified = await this._userUsecase.verifyForgot(email, otp);
+
 
       return res.status(isVerified.status).json(isVerified.data);
 
@@ -135,6 +138,42 @@ class UserController {
       next(error);
     }
   }
+
+  async getUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.userId;
+      const userData = await this._userUsecase.fetchUser(userId);
+
+      if (userData.status === 200) {
+        return res.status(userData.status).json(userData.data);
+      } else {
+        return res.status(userData.status).json(userData.message);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+
+
+  async changeStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { status, userId } = req.body;
+
+      const statusChanged = await this._userUsecase.statusChange(status, userId);
+
+      if (statusChanged.status === 200) {
+        return res.status(statusChanged.status).json(statusChanged.message)
+      }
+
+
+    } catch (error) {
+      console.error("Error in changeStatus:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
 
 }
 

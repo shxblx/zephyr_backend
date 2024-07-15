@@ -12,6 +12,8 @@ interface UserRepo {
   ): Promise<any>;
   findOtpByEmail(email: string): Promise<any>;
   deleteOtpByEmail(email: string): Promise<any>;
+  findById(id: string): Promise<User | null>;
+  updateUser(user: User): Promise<User | null>;
 }
 
 export default UserRepo;

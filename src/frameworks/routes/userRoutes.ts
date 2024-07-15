@@ -62,6 +62,14 @@ userRouter.post("/forgotVerify", (req, res, next) => {
   userController.forgotVerify(req, res, next);
 });
 
+userRouter.get('/getUser/:userId', (req, res, next) => {
+  userController.getUser(req, res, next)
+})
+
+userRouter.put("/changeStatus", (req, res, next) => {
+  userController.changeStatus(req, res, next)
+})
+
 userRouter.use(errorHandle);
 
 export default userRouter;

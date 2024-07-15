@@ -33,6 +33,7 @@ adminRouter.post("/unblockUser", adminAuth, (req, res, next) => {
   adminController.unBlockUser(req, res, next);
 });
 
+
 adminRouter.use(errorHandle);
 
 export default adminRouter;

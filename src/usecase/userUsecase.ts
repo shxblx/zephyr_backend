@@ -1,3 +1,4 @@
+import User from "../entities/user";
 import EncryptOtp from "../frameworks/utils/bcryptOtp";
 import EncryptPassword from "../frameworks/utils/bcryptPassword";
 import GenerateOtp from "../frameworks/utils/generateOtp";
@@ -59,7 +60,8 @@ class UserUsecase {
   ) {
     try {
       const otp = this._generateOtp.createOtp();
-      console.log("OTP: " + otp);
+
+
 
       const user = {
         email,
@@ -90,6 +92,7 @@ class UserUsecase {
       };
     }
   }
+
 
   async verifyOtp(email: string, otp: number) {
     try {
@@ -122,10 +125,29 @@ class UserUsecase {
       const isVerified = await this._encryptOtp.compare(otp, otpData.otp);
 
       if (isVerified) {
-        const userData = await this._userRepository.saveUser(data);
+        const savedUser = await this._userRepository.saveUser(data);
+
+        if (!savedUser) {
+          return { status: 500, message: "Failed to save user" };
+        }
+
         await this._userRepository.deleteOtpByEmail(email);
 
-        const token = this._jwtToken.generateToken(userData._id, "user");
+        const userData: Omit<User, 'password'> = {
+          _id: savedUser._id,
+          userName: savedUser.userName,
+          displayName: savedUser.displayName,
+          email: savedUser.email,
+          wallet: savedUser.wallet,
+          status: savedUser.status,
+          profilePicture: savedUser.profilePicture,
+          isPremium: savedUser.isPremium,
+          isBlocked: savedUser.isBlocked,
+          isAdmin: savedUser.isAdmin,
+          joined_date: savedUser.joined_date
+        };
+
+        const token = this._jwtToken.generateToken(savedUser._id, "user");
 
         return {
           status: 200,
@@ -139,48 +161,51 @@ class UserUsecase {
         return { status: 400, message: "Incorrect OTP" };
       }
     } catch (error) {
+      console.error('Error in verifyOtp:', error);
       return {
-        status: 400,
-        message: "An error occurred",
+        status: 500,
+        message: "An error occurred while verifying OTP",
       };
     }
   }
 
   async resendOtp(email: string) {
-
     try {
       const newOtp = this._generateOtp.createOtp();
       console.log("New OTP:" + newOtp);
-      this._generateMail.sendMail(email, newOtp);
-      let user = await this._userRepository.findByEmail(email)
+
+      await this._generateMail.sendMail(email, newOtp);
+
+      let user = await this._userRepository.findByEmail(email);
       if (!user) {
-        user = await this._userRepository.findOtpByEmail(email)
+        user = await this._userRepository.findOtpByEmail(email);
       }
 
-      let userData: {
-        userName: string;
-        displayName: string;
-        profile: string | null;
-        status: "Online" | "Idle" | "Do not Disturb";
-        joined_date: Date | null;
-      } | null = null;
-
-      if (user) {
-        userData = {
-          userName: user.userName,
-          displayName: user.displayName,
-          profile: user.profilePicture || null,
-          status: user.status || "Online",
-          joined_date: user.joined_date || null,
+      if (!user) {
+        return {
+          status: 404,
+          message: "User not found",
         };
       }
 
-
-
+      const userData: Omit<User, 'password'> = {
+        _id: user._id,
+        userName: user.userName,
+        displayName: user.displayName,
+        email: user.email,
+        wallet: user.wallet,
+        status: user.status,
+        profilePicture: user.profilePicture,
+        isPremium: user.isPremium,
+        isBlocked: user.isBlocked,
+        isAdmin: user.isAdmin,
+        joined_date: user.joined_date
+      };
 
       const hashedOtp = await this._encryptOtp.encrypt(newOtp);
 
       await this._userRepository.saveOtp(email, hashedOtp);
+
       return {
         status: 200,
         data: {
@@ -189,55 +214,66 @@ class UserUsecase {
         },
       };
     } catch (error) {
+      console.error('Error in resendOtp:', error);
+      if (error instanceof Error) {
+        return {
+          status: 500,
+          message: `An error occurred: ${error.message}`,
+        };
+      }
       return {
-        status: 400,
-        message: "An error occurred",
+        status: 500,
+        message: "An unexpected error occurred",
       };
     }
   }
 
   async verifyUser(email: string, password: string) {
     try {
-      const isVerified = await this._userRepository.findByEmail(email);
+      const user = await this._userRepository.findByEmail(email);
 
-      let userData: {
-        userName: string;
-        displayName: string;
-        profile: string | null;
-        status: "Online" | "Idle" | "Do not Disturb";
-        joined_date: Date | null;
-      } | null = null;
-
-      if (isVerified) {
-        userData = {
-          userName: isVerified.userName,
-          displayName: isVerified.displayName,
-          profile: isVerified.profilePicture || null,
-          status: isVerified.status || "Online",
-          joined_date: isVerified.joined_date || null,
-        };
-      }
-
-
-      if (!isVerified) {
+      if (!user) {
         return {
           status: 400,
           message: "User doesn't exist",
         };
       }
+
+      if (user.isBlocked === true) {
+        return {
+          status: 400,
+          message: "Unauthorized Access"
+        }
+      }
+
       const passwordVerified = await this._encryptPassword.compare(
         password,
-        isVerified?.password
+        user.password
       );
 
-
-      const token = this._jwtToken.generateToken(isVerified._id, "user");
-      if (passwordVerified === false) {
+      if (!passwordVerified) {
         return {
           status: 400,
           message: "Wrong password",
         };
+      }
+
+      const token = this._jwtToken.generateToken(user._id, "user");
+
+      const userData: Omit<User, 'password'> = {
+        _id: user._id,
+        userName: user.userName,
+        displayName: user.displayName,
+        email: user.email,
+        wallet: user.wallet,
+        status: user.status,
+        profilePicture: user.profilePicture,
+        isPremium: user.isPremium,
+        isBlocked: user.isBlocked,
+        isAdmin: user.isAdmin,
+        joined_date: user.joined_date
       };
+
       return {
         status: 200,
         data: {
@@ -256,25 +292,45 @@ class UserUsecase {
 
   async verifyForgot(email: string, otp: number) {
     try {
+
       const otpData = await this._userRepository.findOtpByEmail(email);
-      const otpVerified = await this._encryptOtp.compare(otp, otpData.otp);
+      const otpVerified = await this._encryptOtp.compare(otp, otpData.otp)
 
       const now = new Date().getTime();
       const otpGeneratedAt = new Date(otpData.otpGeneratedAt).getTime();
       const otpExpiration = 1 * 60 * 1000;
 
       if (now - otpGeneratedAt > otpExpiration) {
+
         await this._userRepository.deleteOtpByEmail(email);
+
         return {
           status: 400,
           message: "OTP has expired",
         };
       }
+      const user = await this._userRepository.findByEmail(email)
 
-      if (otpVerified) {
+
+
+      if (otpVerified && user) {
+        const userData: Omit<User, 'password'> = {
+          _id: user._id,
+          userName: user.userName,
+          displayName: user.displayName,
+          email: user.email,
+          wallet: user.wallet,
+          status: user.status,
+          profilePicture: user.profilePicture,
+          isPremium: user.isPremium,
+          isBlocked: user.isBlocked,
+          isAdmin: user.isAdmin,
+          joined_date: user.joined_date
+        };
         return {
           status: 200,
           data: {
+            userData,
             message: "OTP Successfully verified",
           }
         };
@@ -285,12 +341,79 @@ class UserUsecase {
         };
       }
     } catch (error) {
+      console.log(error);
+
       return {
         status: 400,
         message: "An error occurred",
       };
     }
   }
+
+  async fetchUser(userId: string) {
+    try {
+      const user = await this._userRepository.findById(userId);
+      if (user) {
+        const userData: Omit<User, 'password'> = {
+          _id: user._id,
+          userName: user.userName,
+          displayName: user.displayName,
+          email: user.email,
+          wallet: user.wallet,
+          status: user.status,
+          profilePicture: user.profilePicture,
+          isPremium: user.isPremium,
+          isBlocked: user.isBlocked,
+          isAdmin: user.isAdmin,
+          joined_date: user.joined_date
+        };
+        return {
+          status: 200,
+          data: {
+            userData
+          }
+        };
+      } else {
+        return {
+          status: 404,
+          message: 'User not found'
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      throw new Error('Failed to fetch user');
+    }
+  }
+
+  async statusChange(status: string, userId: string) {
+    try {
+      const user = await this._userRepository.findById(userId);
+      if (!user) {
+        return {
+          status: 400,
+          message: "User not Found"
+        }
+      }
+
+      user.status = status;
+
+      await this._userRepository.updateUser(user);
+
+      return {
+        status: 200,
+        message: "Status updated successfully"
+      }
+    } catch (error) {
+      console.log(error);
+
+      return {
+        status: 400,
+        message: "An error Occured"
+      }
+    }
+  }
+
+
 }
 
 export default UserUsecase;

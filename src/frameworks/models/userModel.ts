@@ -24,8 +24,7 @@ const userSchema: Schema<User & Document> = new Schema({
   },
   status: {
     type: String,
-    enum: ["Online", "Idle", "Do not Disturb"],
-    default: "Online",
+    default:"Online"
   },
   profilePicture: {
     type: String,

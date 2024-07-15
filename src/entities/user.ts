@@ -4,8 +4,8 @@ interface User {
   displayName: string;
   email: string;
   password: string;
-  wallet?: number; 
-  status?: "Online" | "Do not Disturb" | "Idle"; 
+  wallet?: number;
+  status?: string;
   profilePicture?: string;
   isPremium?: boolean;
   isBlocked?: boolean;
