@@ -69,6 +69,8 @@ class UserUsecase {
         displayName,
         password,
       };
+      console.log("OTP:", otp);
+
       const hashedOtp = await this._encryptOtp.encrypt(otp);
       const hashedPassword = await this._encryptPassword.encrypt(password);
       await this._userRepository.saveOtp(
@@ -153,7 +155,7 @@ class UserUsecase {
           status: 200,
           data: {
             userData,
-            message: "Welcome to our Zephyr!",
+            message: "Welcome to Zephyr!",
             token,
           },
         };
@@ -410,6 +412,107 @@ class UserUsecase {
         status: 400,
         message: "An error Occured"
       }
+    }
+  }
+
+  async userNameChange(userId: string, newName: string) {
+    try {
+      const user = await this._userRepository.findById(userId);
+
+      if (!user) {
+        return {
+          status: 404,
+          message: "User not found",
+        };
+      }
+
+
+      user.userName = newName;
+      console.log(user);
+
+      await this._userRepository.updateUser(user);
+
+      return {
+        status: 200,
+        message: "Username updated successfully",
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+
+  async displayNameChange(userId: string, newName: string) {
+    try {
+      const user = await this._userRepository.findById(userId);
+
+      if (!user) {
+        return {
+          status: 404,
+          message: "User not found",
+        };
+      }
+
+
+      user.displayName = newName;
+      console.log(user);
+
+      await this._userRepository.updateUser(user);
+
+      return {
+        status: 200,
+        message: "DisplayName updated successfully",
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+
+  async passwordChange(userId: string, currentPassword: string, newPassword: string) {
+    try {
+      const user = await this._userRepository.findById(userId);
+
+      if (!user) {
+        return {
+          status: 404,
+          message: "User not found",
+        };
+      }
+
+      const passwordMatch = await this._encryptPassword.compare(currentPassword, user.password)
+      console.log(passwordMatch);
+
+
+      if (!passwordMatch) {
+        return {
+          status: 400,
+          message: "Old Password Do not Match"
+        }
+      }
+
+      const hashedPassword = await this._encryptPassword.encrypt(newPassword)
+      user.password = hashedPassword;
+      await this._userRepository.updateUser(user);
+      return {
+        status: 200,
+        message: "Password changed successfully",
+      };
+
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
     }
   }
 

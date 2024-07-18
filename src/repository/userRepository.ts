@@ -14,9 +14,7 @@ class UserRepository implements UserRepo {
 
   async saveUser(user: User): Promise<User> {
     const newUser = new UserModel(user);
-
     const savedUser = await newUser.save();
-
     return savedUser;
   }
 
@@ -70,7 +68,6 @@ class UserRepository implements UserRepo {
   async updateUser(user: User): Promise<User | null> {
     return UserModel.findOneAndUpdate(
       user,
-      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     ).exec();
   }
 }

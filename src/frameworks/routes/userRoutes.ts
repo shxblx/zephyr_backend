@@ -70,6 +70,17 @@ userRouter.put("/changeStatus", (req, res, next) => {
   userController.changeStatus(req, res, next)
 })
 
+userRouter.put("/changeUserName", (req, res, next) => {
+  userController.changeUserName(req, res, next)
+})
+userRouter.put("/changeDisplayName", (req, res, next) => {
+  userController.changeDisplayName(req, res, next)
+})
+
+userRouter.put("/changePassword", (req, res, next) => {
+  userController.changePassword(req, res, next)
+})
+
 userRouter.use(errorHandle);
 
 export default userRouter;

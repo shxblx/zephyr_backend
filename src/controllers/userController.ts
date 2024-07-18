@@ -150,8 +150,7 @@ class UserController {
         return res.status(userData.status).json(userData.message);
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      next(error)
     }
   }
 
@@ -167,14 +166,40 @@ class UserController {
         return res.status(statusChanged.status).json(statusChanged.message)
       }
 
-
     } catch (error) {
-      console.error("Error in changeStatus:", error);
-      res.status(500).json({ error: "Internal server error" });
+      next(error)
     }
   }
 
+  async changeUserName(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, newName } = req.body
+      const changed = await this._userUsecase.userNameChange(userId, newName)
+      return res.status(changed.status).json(changed.message)
+    } catch (error) {
+      next(error)
+    }
+  }
 
+  async changeDisplayName(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, newName } = req.body
+      const changed = await this._userUsecase.displayNameChange(userId, newName)
+      return res.status(changed.status).json(changed.message)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async changePassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, currentPassword, newPassword } = req.body
+      const changed = await this._userUsecase.passwordChange(userId, currentPassword, newPassword)
+      return res.status(changed.status).json(changed.message)
+    } catch (error) {
+
+    }
+  }
 }
 
 export default UserController;
