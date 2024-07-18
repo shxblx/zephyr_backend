@@ -1,6 +1,7 @@
 import User from "../entities/user";
 import EncryptOtp from "../frameworks/utils/bcryptOtp";
 import EncryptPassword from "../frameworks/utils/bcryptPassword";
+import cloudinary from "../frameworks/utils/cloudinaryConfig";
 import GenerateOtp from "../frameworks/utils/generateOtp";
 import JWTToken from "../frameworks/utils/generateToken";
 import sendOtp from "../frameworks/utils/sendMail";
@@ -20,7 +21,7 @@ class UserUsecase {
     encryptPassword: EncryptPassword,
     encryptOtp: EncryptOtp,
     generateMail: sendOtp,
-    jwtToken: JWTToken
+    jwtToken: JWTToken,
   ) {
     this._userRepository = UserRepository;
     this._generateOtp = generateOtp;
@@ -532,6 +533,48 @@ class UserUsecase {
     }
   }
 
+  async changeProfilePicture(userId: string, file: Express.Multer.File) {
+    try {
+      const base64File = file.buffer.toString('base64');
+      const dataURI = `data:${file.mimetype};base64,${base64File}`;
+
+      const uploadResult = await cloudinary.uploader.upload(dataURI, {
+        resource_type: 'auto'
+      });
+
+      const pictureUrl = uploadResult.secure_url;
+
+      const user = await this._userRepository.findById(userId)
+
+      if (!user) {
+        return {
+          status: 400,
+          message: "User not Found"
+        }
+      }
+
+      if (!pictureUrl) {
+        return {
+          status: 400,
+          message: "Error while Uploading"
+        }
+      }
+
+      user.profilePicture = pictureUrl
+      await this._userRepository.updateUser(user)
+      return {
+        status: 200,
+        data: {
+          profileUrl: pictureUrl,
+          message: "Profile Picture Updated Successfully"
+        }
+      }
+
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 
 }
 

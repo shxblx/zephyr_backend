@@ -8,6 +8,7 @@ import EncryptOtp from "../utils/bcryptOtp";
 import sendOtp from "../utils/sendMail";
 import JWTToken from "../utils/generateToken";
 import errorHandle from "../middlewares/errorHandle";
+import upload from "../middlewares/multer";
 
 const userRouter = express.Router();
 
@@ -28,7 +29,8 @@ const userCase = new UserUsecase(
   ecryptPassword,
   encryptOtp,
   generateMail,
-  jwtToken
+  jwtToken,
+ 
 );
 
 //controllers
@@ -80,6 +82,10 @@ userRouter.put("/changeDisplayName", (req, res, next) => {
 userRouter.put("/changePassword", (req, res, next) => {
   userController.changePassword(req, res, next)
 })
+
+userRouter.put("/changeProfile", upload.single('profilePicture'), (req, res, next) => {
+  userController.changeProfilePicture(req, res, next);
+});
 
 userRouter.use(errorHandle);
 

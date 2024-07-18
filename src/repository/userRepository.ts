@@ -76,7 +76,6 @@ class UserRepository implements UserRepo {
       { new: true }
     ).exec();
   }
-
 }
 
 export default UserRepository;

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import UserUsecase from "../usecase/userUsecase";
 import dotenv from "dotenv";
+import cloudinary from "../frameworks/utils/cloudinaryConfig";
 dotenv.config();
 
 class UserController {
@@ -198,6 +199,34 @@ class UserController {
       return res.status(changed.status).json(changed.message)
     } catch (error) {
 
+    }
+  }
+
+  async changeProfilePicture(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.body.userId;
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).json({ message: 'No file uploaded' });
+        return;
+      }
+
+      if (!userId) {
+        res.status(400).json({ message: 'User ID is required' });
+        return;
+      }
+
+      const pictureUrl = await this._userUsecase.changeProfilePicture(userId, file);
+
+      if (pictureUrl.status===200){
+        return res.status(pictureUrl.status).json(pictureUrl.data)
+      }
+
+        res.status(pictureUrl.status).json(pictureUrl.message)
+    } catch (error) {
+      console.log(error);
+      next(error);
     }
   }
 }

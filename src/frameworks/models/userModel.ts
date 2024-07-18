@@ -24,12 +24,10 @@ const userSchema: Schema<User & Document> = new Schema({
   },
   status: {
     type: String,
-    default:"Online"
+    default: "Online"
   },
   profilePicture: {
     type: String,
-    default:
-      "https://res.cloudinary.com/dsm0j8tzn/image/upload/v1720163434/_399e0eec-d6af-4840-8de3-0f8e60d8f9f1_wbqa0y.jpg",
   },
   isBlocked: {
     type: Boolean,
@@ -41,7 +39,7 @@ const userSchema: Schema<User & Document> = new Schema({
   },
   joined_date: {
     type: Date,
-    default: Date.now, // Removed the function call to Date.now()
+    default: Date.now,
   },
 });
 
