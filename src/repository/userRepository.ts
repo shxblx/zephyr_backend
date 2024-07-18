@@ -10,7 +10,10 @@ class UserRepository implements UserRepo {
     return userData;
   }
 
-
+  async findUserName(userName: string): Promise<User | null> {
+    const userData = await UserModel.findOne({ userName: userName })
+    return userData
+  }
 
   async saveUser(user: User): Promise<User> {
     const newUser = new UserModel(user);
@@ -66,10 +69,14 @@ class UserRepository implements UserRepo {
   }
 
   async updateUser(user: User): Promise<User | null> {
+    const { _id, ...updateData } = user;
     return UserModel.findOneAndUpdate(
-      user,
+      { _id: user._id },
+      updateData,
+      { new: true }
     ).exec();
   }
+
 }
 
 export default UserRepository;

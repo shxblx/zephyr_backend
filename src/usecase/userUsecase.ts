@@ -30,9 +30,17 @@ class UserUsecase {
     this._jwtToken = jwtToken;
   }
 
-  async checkExist(email: string) {
+  async checkExist(email: string, userName: string) {
     try {
       const userExist = await this._userRepository.findByEmail(email);
+      const userNameExist = await this._userRepository.findUserName(userName)
+      if (userNameExist) {
+        return {
+          status: 400,
+          message: "Username already taken"
+        }
+      }
+
       if (userExist) {
         return {
           status: 400,
@@ -426,9 +434,16 @@ class UserUsecase {
         };
       }
 
+      const userNameExist = await this._userRepository.findUserName(newName);
+
+      if (userNameExist && userNameExist._id && userNameExist._id.toString() !== userId) {
+        return {
+          status: 400,
+          message: "Username already taken",
+        };
+      }
 
       user.userName = newName;
-      console.log(user);
 
       await this._userRepository.updateUser(user);
 
@@ -446,6 +461,7 @@ class UserUsecase {
   }
 
 
+
   async displayNameChange(userId: string, newName: string) {
     try {
       const user = await this._userRepository.findById(userId);
@@ -459,7 +475,6 @@ class UserUsecase {
 
 
       user.displayName = newName;
-      console.log(user);
 
       await this._userRepository.updateUser(user);
 
@@ -481,6 +496,7 @@ class UserUsecase {
     try {
       const user = await this._userRepository.findById(userId);
 
+
       if (!user) {
         return {
           status: 404,
@@ -495,7 +511,7 @@ class UserUsecase {
       if (!passwordMatch) {
         return {
           status: 400,
-          message: "Old Password Do not Match"
+          message: "Current password is incorrect."
         }
       }
 

@@ -12,7 +12,7 @@ class UserController {
 
   async signUp(req: Request, res: Response, next: NextFunction) {
     try {
-      const verifyUser = await this._userUsecase.checkExist(req.body.email);
+      const verifyUser = await this._userUsecase.checkExist(req.body.email, req.body.userName);
 
       if (verifyUser.status === 200) {
         const user = await this._userUsecase.signup(
