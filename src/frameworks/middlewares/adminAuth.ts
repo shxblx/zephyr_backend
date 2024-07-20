@@ -10,7 +10,6 @@ interface JwtPayload {
 const adminAuth = (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = req.cookies.adminJwt;
-        console.log(`Token for ${req.method} ${req.path}:`, token);
 
 
         if (!token) {

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import UserUsecase from "../usecase/userUsecase";
 import dotenv from "dotenv";
-import cloudinary from "../frameworks/utils/cloudinaryConfig";
 dotenv.config();
 
 class UserController {
@@ -219,11 +218,11 @@ class UserController {
 
       const pictureUrl = await this._userUsecase.changeProfilePicture(userId, file);
 
-      if (pictureUrl.status===200){
+      if (pictureUrl.status === 200) {
         return res.status(pictureUrl.status).json(pictureUrl.data)
       }
 
-        res.status(pictureUrl.status).json(pictureUrl.message)
+      res.status(pictureUrl.status).json(pictureUrl.message)
     } catch (error) {
       console.log(error);
       next(error);

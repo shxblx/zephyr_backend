@@ -52,19 +52,28 @@ class AdminUsecase {
   }
 
   async getUserData() {
-    const usersData = await this._adminRepository.getUsers();
+    try {
+      const usersData = await this._adminRepository.getUsers();
 
-    if (usersData) {
-      return {
-        status: 200,
-        data: usersData.users,
-        total: usersData.total,
-      };
-    } else {
-      return {
-        status: 400,
-        message: "Failed to retrieve data"
+      if (usersData) {
+        return {
+          status: 200,
+          data: usersData.users,
+          total: usersData.total,
+        };
+      } else {
+        return {
+          status: 400,
+          message: "Failed to retrieve data"
+        }
       }
+    } catch (error) {
+      return {
+        status: 500,
+        message: "An error Occured"
+      }
+      console.log(error);
+
     }
   }
 
