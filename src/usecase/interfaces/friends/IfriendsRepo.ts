@@ -8,6 +8,8 @@ interface FriendRepo {
     findFriendRepo(id: string): Promise<Friend | null>;
     saveFriend(friend: Friend): Promise<Friend | null>;
     addFriendToExisting(userId: string, friendId: string): Promise<Friend | null>;
+    fetchFriends(userId: string): Promise<Friend | null>;
+    getAllUsers(searchTerm?: string): Promise<{ users: {}[]; }>
 }
 
 export default FriendRepo;

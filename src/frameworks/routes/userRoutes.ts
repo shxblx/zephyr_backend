@@ -30,7 +30,6 @@ const userCase = new UserUsecase(
   encryptOtp,
   generateMail,
   jwtToken,
- 
 );
 
 //controllers

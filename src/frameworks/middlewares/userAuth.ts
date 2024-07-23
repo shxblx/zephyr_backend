@@ -1,34 +1,40 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-
-interface JwtPayload {
-    id: string;
-    role: string;
-}
+import { Request, Response, NextFunction } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import UserModel from "../models/userModel";
 
 
-const userAuth = (req: Request, res: Response, next: NextFunction) => {
+export const userAuth = async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.cookies.jwt;
+
+    if (!token) {
+        return res.status(401).json("Authentication cookie missing");
+    }
+
     try {
-        const token = req.cookies.jwt;
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as JwtPayload;
 
-
-        if (!token) {
-
-            return res.status(401).json({ message: 'Authentication required' });
+        if (decodedToken.role !== "user") {
+            return res.status(403).json("Unauthorized access");
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as JwtPayload;
+        const userId = decodedToken.userId;
+        const user = await UserModel.findById(userId);
 
-        if (decoded.role !== 'user') {
+        if (!user) {
+            return res.status(404).json("User not found");
+        }
 
-            return res.status(403).json({ message: 'user access required' });
+        if (user.isBlocked) {
+
+            return res.status(403).json("User is blocked");
         }
 
 
         next();
     } catch (error) {
-        return res.status(401).json({ message: 'Invalid or expired token' });
+        console.error("Error verifying token:", error);
+        return res.status(401).json("Invalid or expired token");
     }
 };
 
-export default userAuth;
+export default userAuth

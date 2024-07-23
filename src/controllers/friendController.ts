@@ -14,16 +14,15 @@ class FriendController {
 
     async getGlobalFriend(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log(req.params.userId);
-
-            const friendData = await this._friendUsecase.getGfriends(req.params.userId)
+            const searchTerm = req.query.search as string | undefined;
+            const friendData = await this._friendUsecase.getGfriends(req.params.userId, searchTerm)
 
             if (friendData?.status === 200) {
                 return res.status(friendData.status).json(friendData.friendsData)
             }
             return res.status(friendData?.status).json(friendData?.message)
         } catch (error) {
-            next()
+            next(error)
         }
     }
 
@@ -34,6 +33,34 @@ class FriendController {
             return res.status(friendAdded.status).json(friendAdded.message)
         } catch (error) {
             next(error)
+        }
+    }
+
+    async getFriends(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await this._friendUsecase.fetchFriends(req.params.userId);
+            if (result.status === 200) {
+                return res.status(result.status).json(result);
+            } else {
+                return res.status(result.status).json(result.message)
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async fetchAllUsers(req: Request, res: Response, next: NextFunction) {
+        try {
+            const searchTerm = req.query.search as string | undefined;
+            const result = await this._friendUsecase.getUsers(searchTerm);
+
+            if (result.status === 200) {
+                return res.status(result.status).json(result);
+            } else {
+                return res.status(result.status).json({ message: result.message });
+            }
+        } catch (error) {
+            next(error);
         }
     }
 }

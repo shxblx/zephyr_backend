@@ -10,10 +10,10 @@ class FriendUseCase {
         this._friendRepository = friendRepository;
     }
 
-    async getGfriends(currentUserId: string) {
+    async getGfriends(currentUserId: string, searchTerm?: string) {
         try {
-            console.log("here", currentUserId);
-            const friendsData = await this._friendRepository.getGfriends(currentUserId);
+            const friendsData = await this._friendRepository.getGfriends(currentUserId, searchTerm);
+            console.log(friendsData);
 
 
             if (friendsData) {
@@ -76,6 +76,47 @@ class FriendUseCase {
 
         } catch (error) {
             console.error("Error in addFriend:", error);
+            return {
+                status: 500,
+                message: "Internal server error"
+            };
+        }
+    }
+
+    async fetchFriends(userId: string) {
+        try {
+            const result = await this._friendRepository.fetchFriends(userId);
+            if (!result) {
+                return {
+                    status: 404,
+                    message: "Friends not found"
+                };
+            }
+            return {
+                status: 200,
+                data: result
+            };
+        } catch (error: any) {
+            console.error("Error in fetchFriends use case:", error);
+            return {
+                status: 500,
+                message: "Internal server error"
+            };
+        }
+    }
+
+    async getUsers(searchTerm?: string) {
+        try {
+
+            const users = await this._friendRepository.getAllUsers(searchTerm);
+            console.log(users);
+
+            return {
+                status: 200,
+                data: users
+            };
+        } catch (error) {
+            console.error("Error in getUsers use case:", error);
             return {
                 status: 500,
                 message: "Internal server error"

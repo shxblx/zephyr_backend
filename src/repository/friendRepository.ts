@@ -6,7 +6,8 @@ import Friend from "../entities/friends";
 import FriendModel from "../frameworks/models/friendModel";
 
 class FriendRepository implements FriendRepo {
-    async getGfriends(currentUserId: string): Promise<{ users: {}[]; }> {
+
+    async getGfriends(currentUserId: string, searchTerm?: string): Promise<{ users: {}[]; }> {
         const currentUserFriends = await FriendModel.findOne({ userId: currentUserId })
             .select('friends.friendId')
             .lean();
@@ -16,12 +17,30 @@ class FriendRepository implements FriendRepo {
             friendIds = currentUserFriends.friends.map(friend => friend.friendId);
         }
 
-        const users = await UserModel.find({
+        let matchQuery: any = {
             _id: { $nin: [...friendIds, new mongoose.Types.ObjectId(currentUserId)] },
             isBlocked: false
-        })
-            .select('_id userName displayName profilePicture')
-            .lean();
+        };
+
+        if (searchTerm) {
+            matchQuery.$or = [
+                { userName: { $regex: searchTerm, $options: 'i' } },
+                { displayName: { $regex: searchTerm, $options: 'i' } }
+            ];
+        }
+
+        const users = await UserModel.aggregate([
+            { $match: matchQuery },
+            { $sample: { size: searchTerm ? 100 : 10 } },
+            {
+                $project: {
+                    _id: 1,
+                    userName: 1,
+                    displayName: 1,
+                    profilePicture: 1
+                }
+            }
+        ]);
 
         return { users };
     }
@@ -65,6 +84,79 @@ class FriendRepository implements FriendRepo {
         ).lean().exec();
 
         return updated;
+    }
+
+    async fetchFriends(userId: string): Promise<Friend | null> {
+        try {
+            const friendsDoc = await FriendModel.findOne({ userId: userId }).lean().exec();
+
+            if (!friendsDoc || !friendsDoc.friends || friendsDoc.friends.length === 0) {
+                return null;
+            }
+
+            const friendIds = friendsDoc.friends.map(friend => friend.friendId);
+
+            const friends = await UserModel.aggregate([
+                { $match: { _id: { $in: friendIds } } },
+                {
+                    $project: {
+                        _id: 1,
+                        userName: 1,
+                        displayName: 1,
+                        profilePicture: 1,
+                        status: 1
+                    }
+                }
+            ]);
+
+            const result: Friend = {
+                userId: userId,
+                friends: friends.map(friend => ({
+                    friendId: friend._id,
+                    createdAt: new Date(),
+                    ...friend
+                }))
+            };
+
+            return result;
+        } catch (error) {
+            console.error("Error in fetchFriends repository:", error);
+            throw error;
+        }
+    }
+
+    async getAllUsers(searchTerm?: string): Promise<{ users: {}[]; }> {
+        try {
+
+            let matchQuery: any = {};
+
+            if (searchTerm) {
+                matchQuery.$or = [
+                    { userName: { $regex: searchTerm, $options: 'i' } },
+                    { displayName: { $regex: searchTerm, $options: 'i' } }
+                ];
+            }
+
+
+            const users = await UserModel.aggregate([
+                { $match: matchQuery },
+                { $sample: { size: searchTerm ? 100 : 10 } },
+                {
+                    $project: {
+                        _id: 1,
+                        userName: 1,
+                        displayName: 1,
+                        profilePicture: 1,
+                        status: 1
+                    }
+                }
+            ]);
+
+            return { users };
+        } catch (error) {
+            console.error("Error in getAllUsers repository:", error);
+            throw error;
+        }
     }
 }
 

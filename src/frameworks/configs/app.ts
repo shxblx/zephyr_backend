@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import userRouter from "../routes/userRoutes";
 import adminRouter from "../routes/adminRoutes";
 import friendRouter from "../routes/friendRoutes";
+import communityRouter from "../routes/communityRoutes";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use(
 // Routes
 app.use("/user", userRouter);
 app.use("/user", friendRouter);
+app.use("/user", communityRouter);
 app.use("/admin", adminRouter);
 
 export default app;
