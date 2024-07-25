@@ -18,21 +18,13 @@ const communitySchema: Schema<Community & Document> = new Schema({
         type: Boolean,
         default: false,
     },
+    isBanned: { 
+        type: Boolean,
+        default: false,
+    },
     profilePicture: {
         type: String,
     },
-    members: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-    }],
-    admins: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-    }],
-    coAdmins: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-    }],
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',

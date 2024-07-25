@@ -66,6 +66,54 @@ class AdminController {
       res.sendStatus(500)
     }
   }
+
+  async getCommunities(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      const communities = await this._adminUsecase.getCommunities();
+
+      if (communities.status === 200) {
+        return res.status(communities.status).json(communities.communities)
+      }
+      return res.status(communities.status).json(communities.status)
+    } catch (error) {
+      next(error);
+    }
+  }
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("here");
+
+      res.cookie("adminJwt", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development",
+        expires: new Date(0),
+        sameSite: "strict",
+      });
+
+      return res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async banCommunity(req: Request, res: Response, next: NextFunction) {
+    try {
+      const banCommunity = await this._adminUsecase.banCommunity(req.body.communityId)
+      return res.status(banCommunity.status).json(banCommunity.message)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async unbanCommunity(req: Request, res: Response, next: NextFunction) {
+    try {
+      const unbanCommunity = await this._adminUsecase.unbanCommunity(req.body.communityId)
+      return res.status(unbanCommunity.status).json(unbanCommunity.message)
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export default AdminController;

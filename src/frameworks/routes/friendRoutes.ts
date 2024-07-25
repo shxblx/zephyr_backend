@@ -32,6 +32,10 @@ friendRouter.get("/getAllUsers", userAuth, (req, res, next) => {
     friendController.fetchAllUsers(req, res, next);
 });
 
+friendRouter.patch("/removeFriend", userAuth, (req, res, next) => {
+    friendController.removeFriend(req, res, next)
+})
+
 friendRouter.use(errorHandle);
 
 export default friendRouter;

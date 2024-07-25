@@ -6,13 +6,11 @@ interface Community {
     description: string;
     hashtags: string[];
     isPrivate: boolean;
+    isBanned?: boolean;
     profilePicture?: string;
-    members: mongoose.Types.ObjectId[];
-    admins: mongoose.Types.ObjectId[];
-    coAdmins: mongoose.Types.ObjectId[];
     createdBy: mongoose.Types.ObjectId;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export default Community;

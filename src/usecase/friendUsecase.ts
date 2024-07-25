@@ -13,8 +13,6 @@ class FriendUseCase {
     async getGfriends(currentUserId: string, searchTerm?: string) {
         try {
             const friendsData = await this._friendRepository.getGfriends(currentUserId, searchTerm);
-            console.log(friendsData);
-
 
             if (friendsData) {
                 return {
@@ -86,6 +84,8 @@ class FriendUseCase {
     async fetchFriends(userId: string) {
         try {
             const result = await this._friendRepository.fetchFriends(userId);
+            console.log(result);
+
             if (!result) {
                 return {
                     status: 404,
@@ -124,6 +124,21 @@ class FriendUseCase {
         }
     }
 
+    async removeFriend(userId: string, friendId: string) {
+        try {
+            const friendRemoved = await this._friendRepository.removeFriend(userId, friendId)
+            if (friendRemoved) {
+                return { status: 200, message: "Friend removed successfully" }
+            }
+            return { status: 400, message: "Failed to remove Friend" }
+        } catch (error) {
+            console.error("Error in getUsers use case:", error);
+            return {
+                status: 500,
+                message: "Internal server error"
+            };
+        }
+    }
 }
 
 export default FriendUseCase;

@@ -33,6 +33,21 @@ adminRouter.post("/unblockUser", adminAuth, (req, res, next) => {
   adminController.unBlockUser(req, res, next);
 });
 
+adminRouter.get("/getCommunities", adminAuth, (req, res, next) => {
+  adminController.getCommunities(req, res, next)
+})
+
+adminRouter.post("/logout", adminAuth, (req, res, next) => {
+  adminController.logout(req, res, next)
+})
+
+adminRouter.post("/banCommunity", adminAuth, (req, res, next) => {
+  adminController.banCommunity(req, res, next);
+});
+
+adminRouter.post("/unbanCommunity", adminAuth, (req, res, next) => {
+  adminController.unbanCommunity(req, res, next);
+});
 
 adminRouter.use(errorHandle);
 

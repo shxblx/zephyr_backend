@@ -121,6 +121,58 @@ class AdminUsecase {
     }
   }
 
+  async getCommunities() {
+    try {
+      const communities = await this._adminRepository.fetchCommunities();
+      if (!communities) {
+        return { status: 400, message: "No Communities Found" }
+      }
+      return { status: 200, communities }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async banCommunity(communityId: string) {
+    try {
+      const community = await this._adminRepository.findCommunityById(communityId);
+      if (community) {
+        community.isBanned = true;
+        const updatedCommunity = await this._adminRepository.saveCommunity(community);
+        if (updatedCommunity) {
+          return { status: 200 };
+        } else {
+          return { status: 500, message: "Failed to update community" };
+        }
+      } else {
+        return { status: 404, message: "Community not found" };
+      }
+    } catch (error) {
+      console.error("Error banning community:", error);
+      return { status: 500, message: "Internal Server Error" };
+    }
+  }
+
+  async unbanCommunity(communityId: string) {
+    try {
+      const community = await this._adminRepository.findCommunityById(communityId);
+      if (community) {
+        community.isBanned = false;
+        const updatedCommunity = await this._adminRepository.saveCommunity(community);
+        if (updatedCommunity) {
+          return { status: 200 };
+        } else {
+          return { status: 500, message: "Failed to update community" };
+        }
+      } else {
+        return { status: 404, message: "Community not found" };
+      }
+    } catch (error) {
+      console.error("Error unbanning community:", error);
+      return { status: 500, message: "Internal Server Error" };
+    }
+  }
+
 }
 
 export default AdminUsecase;

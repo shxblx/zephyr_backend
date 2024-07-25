@@ -158,6 +158,25 @@ class FriendRepository implements FriendRepo {
             throw error;
         }
     }
+
+    async removeFriend(userId: string, friendId: string): Promise<Friend | null> {
+        try {
+            const updatedFriend = await FriendModel.findOneAndUpdate(
+                { userId: userId },
+                {
+                    $pull: {
+                        friends: { friendId: new mongoose.Types.ObjectId(friendId) }
+                    }
+                },
+                { new: true }
+            ).lean().exec();
+
+            return updatedFriend;
+        } catch (error) {
+            console.error("Error in removeFriend repository:", error);
+            throw error;
+        }
+    }
 }
 
 export default FriendRepository;

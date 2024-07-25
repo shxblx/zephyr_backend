@@ -63,6 +63,17 @@ class FriendController {
             next(error);
         }
     }
+
+    async removeFriend(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId, friendId } = req.body
+            const friendRemoved = await this._friendUsecase.removeFriend(userId, friendId)
+
+            return res.status(friendRemoved?.status).json(friendRemoved.message)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default FriendController
