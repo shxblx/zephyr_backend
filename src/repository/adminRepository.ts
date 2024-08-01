@@ -17,8 +17,8 @@ class AdminRepository implements AdminRepo {
   }
 
   async findById(userId: string): Promise<User | null> {
-    const userData = await UserModel.findOne({ _id: userId })
-    return userData
+    const userData = await UserModel.findOne({ _id: userId });
+    return userData;
   }
 
   async saveUser(user: User): Promise<User> {

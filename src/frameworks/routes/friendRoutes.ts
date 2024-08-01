@@ -17,24 +17,24 @@ const friendCase = new FriendUseCase(friendRepository);
 const friendController = new FriendController(friendCase);
 
 friendRouter.get("/getGlobalFriends/:userId", userAuth, (req, res, next) => {
-    friendController.getGlobalFriend(req, res, next);
+  friendController.getGlobalFriend(req, res, next);
 });
 
 friendRouter.post("/addFriend", userAuth, (req, res, next) => {
-    friendController.addFriend(req, res, next);
+  friendController.addFriend(req, res, next);
 });
 
 friendRouter.get("/getFriends/:userId", userAuth, (req, res, next) => {
-    friendController.getFriends(req, res, next);
+  friendController.getFriends(req, res, next);
 });
 
 friendRouter.get("/getAllUsers", userAuth, (req, res, next) => {
-    friendController.fetchAllUsers(req, res, next);
+  friendController.fetchAllUsers(req, res, next);
 });
 
 friendRouter.patch("/removeFriend", userAuth, (req, res, next) => {
-    friendController.removeFriend(req, res, next)
-})
+  friendController.removeFriend(req, res, next);
+});
 
 friendRouter.use(errorHandle);
 

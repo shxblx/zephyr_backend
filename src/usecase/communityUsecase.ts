@@ -23,11 +23,9 @@ class CommunityUsecase {
             if (profile) {
                 const base64File = profile.buffer.toString('base64');
                 const dataURI = `data:${profile.mimetype};base64,${base64File}`;
-
                 const uploadResult = await cloudinary.uploader.upload(dataURI, {
                     resource_type: 'auto',
                 });
-
                 profilePictureUrl = uploadResult.secure_url;
             }
 
@@ -71,14 +69,15 @@ class CommunityUsecase {
         }
     }
 
-    async getCommunities(userId: string) {
+    async getCommunities(userId: string, search?: string) {
         try {
-            const communities = await this._communityRepository.fetchCommunitiesUserNotIn(userId);
-            return communities;
+          const communities = await this._communityRepository.fetchCommunitiesUserNotIn(userId, search);
+          
+          return communities;
         } catch (error) {
-            throw error;
+          throw error;
         }
-    }
+      }
 
     async joinCommunity(userId: string, communityId: string) {
         try {

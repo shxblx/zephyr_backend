@@ -11,8 +11,8 @@ class UserRepository implements UserRepo {
   }
 
   async findUserName(userName: string): Promise<User | null> {
-    const userData = await UserModel.findOne({ userName: userName })
-    return userData
+    const userData = await UserModel.findOne({ userName: userName });
+    return userData;
   }
 
   async saveUser(user: User): Promise<User> {
@@ -65,16 +65,14 @@ class UserRepository implements UserRepo {
   }
 
   async findById(id: string): Promise<User | null> {
-    return UserModel.findById(id).lean().exec()
+    return UserModel.findById(id).lean().exec();
   }
 
   async updateUser(user: User): Promise<User | null> {
     const { _id, ...updateData } = user;
-    return UserModel.findOneAndUpdate(
-      { _id: user._id },
-      updateData,
-      { new: true }
-    ).exec();
+    return UserModel.findOneAndUpdate({ _id: user._id }, updateData, {
+      new: true,
+    }).exec();
   }
 }
 

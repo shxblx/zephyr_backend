@@ -59,23 +59,24 @@ class AdminController {
 
   async unBlockUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const userUnblocked = await this._adminUsecase.unblockUser(req.body.userId)
-      return res.sendStatus(userUnblocked.status)
+      const userUnblocked = await this._adminUsecase.unblockUser(
+        req.body.userId
+      );
+      return res.sendStatus(userUnblocked.status);
     } catch (error) {
-      console.error("Error in Unblock route", error)
-      res.sendStatus(500)
+      console.error("Error in Unblock route", error);
+      res.sendStatus(500);
     }
   }
 
   async getCommunities(req: Request, res: Response, next: NextFunction) {
     try {
-
       const communities = await this._adminUsecase.getCommunities();
 
       if (communities.status === 200) {
-        return res.status(communities.status).json(communities.communities)
+        return res.status(communities.status).json(communities.communities);
       }
-      return res.status(communities.status).json(communities.status)
+      return res.status(communities.status).json(communities.status);
     } catch (error) {
       next(error);
     }
@@ -99,19 +100,23 @@ class AdminController {
 
   async banCommunity(req: Request, res: Response, next: NextFunction) {
     try {
-      const banCommunity = await this._adminUsecase.banCommunity(req.body.communityId)
-      return res.status(banCommunity.status).json(banCommunity.message)
+      const banCommunity = await this._adminUsecase.banCommunity(
+        req.body.communityId
+      );
+      return res.status(banCommunity.status).json(banCommunity.message);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   async unbanCommunity(req: Request, res: Response, next: NextFunction) {
     try {
-      const unbanCommunity = await this._adminUsecase.unbanCommunity(req.body.communityId)
-      return res.status(unbanCommunity.status).json(unbanCommunity.message)
+      const unbanCommunity = await this._adminUsecase.unbanCommunity(
+        req.body.communityId
+      );
+      return res.status(unbanCommunity.status).json(unbanCommunity.message);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }

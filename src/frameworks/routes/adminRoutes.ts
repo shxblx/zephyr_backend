@@ -34,12 +34,12 @@ adminRouter.post("/unblockUser", adminAuth, (req, res, next) => {
 });
 
 adminRouter.get("/getCommunities", adminAuth, (req, res, next) => {
-  adminController.getCommunities(req, res, next)
-})
+  adminController.getCommunities(req, res, next);
+});
 
 adminRouter.post("/logout", adminAuth, (req, res, next) => {
-  adminController.logout(req, res, next)
-})
+  adminController.logout(req, res, next);
+});
 
 adminRouter.post("/banCommunity", adminAuth, (req, res, next) => {
   adminController.banCommunity(req, res, next);

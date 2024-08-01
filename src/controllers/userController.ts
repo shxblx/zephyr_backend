@@ -12,7 +12,10 @@ class UserController {
 
   async signUp(req: Request, res: Response, next: NextFunction) {
     try {
-      const verifyUser = await this._userUsecase.checkExist(req.body.email, req.body.userName);
+      const verifyUser = await this._userUsecase.checkExist(
+        req.body.email,
+        req.body.userName
+      );
 
       if (verifyUser.status === 200) {
         const user = await this._userUsecase.signup(
@@ -36,9 +39,7 @@ class UserController {
 
       let verified = await this._userUsecase.verifyOtp(email, otp);
 
-
       if (verified.status === 200 && verified.data?.token) {
-
         res.cookie("jwt", verified.data.token, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
@@ -82,12 +83,13 @@ class UserController {
         return res.status(loginVerified.status).json(loginVerified.data);
       }
 
-      return res.status(loginVerified.status).json(loginVerified.message || { message: "Login failed" });
+      return res
+        .status(loginVerified.status)
+        .json(loginVerified.message || { message: "Login failed" });
     } catch (error) {
       next(error);
     }
   }
-
 
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
@@ -114,26 +116,24 @@ class UserController {
       if (otpSent.status === 200 && otpSent.data) {
         return res.status(otpSent.status).json(otpSent.data);
       }
-      return res.status(otpSent.status).json(otpSent.message || { message: "OTP resend failed" });
+      return res
+        .status(otpSent.status)
+        .json(otpSent.message || { message: "OTP resend failed" });
     } catch (error) {
       next(error);
     }
   }
 
-
   async forgotVerify(req: Request, res: Response, next: NextFunction) {
     try {
       const { otp, email } = req.body;
-
 
       if (!otp || !email) {
         return res.status(400).json({ message: "OTP and email are required" });
       }
       const isVerified = await this._userUsecase.verifyForgot(email, otp);
 
-
       return res.status(isVerified.status).json(isVerified.data);
-
     } catch (error) {
       next(error);
     }
@@ -150,55 +150,60 @@ class UserController {
         return res.status(userData.status).json(userData.message);
       }
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
-
-
 
   async changeStatus(req: Request, res: Response, next: NextFunction) {
     try {
       const { status, userId } = req.body;
 
-      const statusChanged = await this._userUsecase.statusChange(status, userId);
+      const statusChanged = await this._userUsecase.statusChange(
+        status,
+        userId
+      );
 
       if (statusChanged.status === 200) {
-        return res.status(statusChanged.status).json(statusChanged.message)
+        return res.status(statusChanged.status).json(statusChanged.message);
       }
-
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   async changeUserName(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId, newName } = req.body
-      const changed = await this._userUsecase.userNameChange(userId, newName)
-      return res.status(changed.status).json(changed.message)
+      const { userId, newName } = req.body;
+      const changed = await this._userUsecase.userNameChange(userId, newName);
+      return res.status(changed.status).json(changed.message);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   async changeDisplayName(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId, newName } = req.body
-      const changed = await this._userUsecase.displayNameChange(userId, newName)
-      return res.status(changed.status).json(changed.message)
+      const { userId, newName } = req.body;
+      const changed = await this._userUsecase.displayNameChange(
+        userId,
+        newName
+      );
+      return res.status(changed.status).json(changed.message);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   async changePassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId, currentPassword, newPassword } = req.body
-      const changed = await this._userUsecase.passwordChange(userId, currentPassword, newPassword)
-      return res.status(changed.status).json(changed.message)
-    } catch (error) {
-
-    }
+      const { userId, currentPassword, newPassword } = req.body;
+      const changed = await this._userUsecase.passwordChange(
+        userId,
+        currentPassword,
+        newPassword
+      );
+      return res.status(changed.status).json(changed.message);
+    } catch (error) {}
   }
 
   async changeProfilePicture(req: Request, res: Response, next: NextFunction) {
@@ -207,22 +212,25 @@ class UserController {
       const file = req.file;
 
       if (!file) {
-        res.status(400).json({ message: 'No file uploaded' });
+        res.status(400).json({ message: "No file uploaded" });
         return;
       }
 
       if (!userId) {
-        res.status(400).json({ message: 'User ID is required' });
+        res.status(400).json({ message: "User ID is required" });
         return;
       }
 
-      const pictureUrl = await this._userUsecase.changeProfilePicture(userId, file);
+      const pictureUrl = await this._userUsecase.changeProfilePicture(
+        userId,
+        file
+      );
 
       if (pictureUrl.status === 200) {
-        return res.status(pictureUrl.status).json(pictureUrl.data)
+        return res.status(pictureUrl.status).json(pictureUrl.data);
       }
 
-      res.status(pictureUrl.status).json(pictureUrl.message)
+      res.status(pictureUrl.status).json(pictureUrl.message);
     } catch (error) {
       console.log(error);
       next(error);
