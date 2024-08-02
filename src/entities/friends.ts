@@ -1,11 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 interface Friend {
-    userId: string;
-    friends: Array<{
-        friendId: mongoose.Types.ObjectId;
-        createdAt: Date;
-    }>;
+  userId: string;
+  friends: Array<{
+    friendId: mongoose.Types.ObjectId;
+    status: "pending" | "accepted";
+    createdAt: Date;
+  }>;
 }
 
 export default Friend;

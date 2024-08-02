@@ -236,6 +236,23 @@ class UserController {
       next(error);
     }
   }
+
+  async getNotification(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      const notifications = await this._userUsecase.fetchNotifications(
+        req.params.userId
+      );
+
+      if (notifications.status === 200) {
+        return res.status(notifications.status).json(notifications.data);
+      } else {
+        return res.status(notifications.status).json(notifications.message);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default UserController;

@@ -9,6 +9,7 @@ import sendOtp from "../utils/sendMail";
 import JWTToken from "../utils/generateToken";
 import errorHandle from "../middlewares/errorHandle";
 import upload from "../middlewares/multer";
+import userAuth from "../middlewares/userAuth";
 
 const userRouter = express.Router();
 
@@ -63,32 +64,37 @@ userRouter.post("/forgotVerify", (req, res, next) => {
   userController.forgotVerify(req, res, next);
 });
 
-userRouter.get("/getUser/:userId", (req, res, next) => {
+userRouter.get("/getUser/:userId", userAuth, (req, res, next) => {
   userController.getUser(req, res, next);
 });
 
-userRouter.put("/changeStatus", (req, res, next) => {
+userRouter.put("/changeStatus", userAuth, (req, res, next) => {
   userController.changeStatus(req, res, next);
 });
 
-userRouter.put("/changeUserName", (req, res, next) => {
+userRouter.put("/changeUserName", userAuth, (req, res, next) => {
   userController.changeUserName(req, res, next);
 });
-userRouter.put("/changeDisplayName", (req, res, next) => {
+userRouter.put("/changeDisplayName", userAuth, (req, res, next) => {
   userController.changeDisplayName(req, res, next);
 });
 
-userRouter.put("/changePassword", (req, res, next) => {
+userRouter.put("/changePassword", userAuth, (req, res, next) => {
   userController.changePassword(req, res, next);
 });
 
 userRouter.put(
   "/changeProfile",
+  userAuth,
   upload.single("profilePicture"),
   (req, res, next) => {
     userController.changeProfilePicture(req, res, next);
   }
 );
+
+userRouter.get("/getNotification/:userId", userAuth, (req, res, next) => {
+  userController.getNotification(req, res, next);
+});
 
 userRouter.use(errorHandle);
 

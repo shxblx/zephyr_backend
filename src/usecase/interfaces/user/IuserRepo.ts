@@ -1,4 +1,5 @@
 import User from "../../../entities/user";
+import UserNotifications from "../../../entities/userNotification";
 
 interface UserRepo {
   findByEmail(email: string): Promise<User | null>;
@@ -15,6 +16,7 @@ interface UserRepo {
   deleteOtpByEmail(email: string): Promise<any>;
   findById(id: string): Promise<User | null>;
   updateUser(user: User): Promise<User | null>;
+  fetchNotifications(userId: string): Promise<UserNotifications | null>
 }
 
 export default UserRepo;

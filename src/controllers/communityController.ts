@@ -41,8 +41,12 @@ class CommunityController {
   }
   async getCommunities(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = req.params.userId;
+      const search = req.query.search as string | undefined;
+
       const communities = await this._commuityUsecase.getCommunities(
-        req.params.userId
+        userId,
+        search
       );
 
       res.status(200).json({
@@ -70,15 +74,13 @@ class CommunityController {
 
   async getMyCommunities(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.params.userId;
-      const search = req.query.search as string | undefined;
-  
-      const communities = await this._commuityUsecase.getCommunities(userId, search);
-  
-      res.status(200).json({
-        success: true,
-        data: communities,
-      });
+      const myCommunities = await this._commuityUsecase.fetchMyCommunities(
+        req.params.userId
+      );
+      if (myCommunities.status === 200) {
+        return res.status(myCommunities.status).json(myCommunities.data);
+      }
+      return res.status(myCommunities.status).json(myCommunities.message);
     } catch (error) {
       next(error);
     }

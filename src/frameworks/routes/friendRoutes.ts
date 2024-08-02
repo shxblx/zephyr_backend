@@ -36,6 +36,14 @@ friendRouter.patch("/removeFriend", userAuth, (req, res, next) => {
   friendController.removeFriend(req, res, next);
 });
 
+friendRouter.patch("/acceptFriendRequest", userAuth, (req, res, next) => {
+  friendController.acceptFriendRequest(req, res, next);
+});
+
+friendRouter.patch("/rejectFriendRequest", userAuth, (req, res, next) => {
+  friendController.rejectFriendRequest(req, res, next);
+});
+
 friendRouter.use(errorHandle);
 
 export default friendRouter;

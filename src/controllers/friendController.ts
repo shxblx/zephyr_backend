@@ -78,6 +78,27 @@ class FriendController {
       next(error);
     }
   }
+
+  async acceptFriendRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, friendId } = req.body;
+      const accepted = await this._friendUsecase.acceptFriend(userId, friendId);
+
+      return res.status(accepted.status).json(accepted.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async rejectFriendRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, friendId } = req.body;
+      const rejected = await this._friendUsecase.rejectFriend(userId, friendId);
+      return res.status(rejected.status).json(rejected.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default FriendController;

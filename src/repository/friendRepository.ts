@@ -4,6 +4,7 @@ import UserModel from "../frameworks/models/userModel";
 import FriendRepo from "../usecase/interfaces/friends/IfriendsRepo";
 import Friend from "../entities/friends";
 import FriendModel from "../frameworks/models/friendModel";
+import UserNotificationsModel from "../frameworks/models/UserNotificationsModel";
 
 class FriendRepository implements FriendRepo {
   async getGfriends(
@@ -49,50 +50,52 @@ class FriendRepository implements FriendRepo {
     return { users };
   }
 
-  async findById(id: string): Promise<User | null> {
-    return UserModel.findById(id).lean().exec();
-  }
-
   async findFriendRepo(id: string): Promise<Friend | null> {
     return FriendModel.findOne({ userId: id }).lean().exec();
   }
 
-  async saveFriend(friend: Friend): Promise<Friend | null> {
-    const newFriend = new FriendModel(friend);
-    const saved = await newFriend.save();
-    return saved;
-  }
-
-  async saveUser(user: User): Promise<User | null> {
-    const newUser = new UserModel(user);
-    const savedUser = await newUser.save();
-    return savedUser;
-  }
-
-  async addFriendToExisting(
-    userId: string,
-    friendId: string
-  ): Promise<Friend | null> {
-    const updated = await FriendModel.findOneAndUpdate(
-      {
-        userId: userId,
-        "friends.friendId": { $ne: new mongoose.Types.ObjectId(friendId) },
-      },
-      {
-        $addToSet: {
-          friends: {
-            friendId: new mongoose.Types.ObjectId(friendId),
-            status: "Pending",
-            createdAt: new Date(),
+  async saveFriend(userId: string, friendId: string): Promise<Friend | null> {
+    try {
+      const newFriend = await FriendModel.findOneAndUpdate(
+        { userId: userId },
+        {
+          $addToSet: {
+            friends: {
+              friendId: new mongoose.Types.ObjectId(friendId),
+              status: "pending",
+              createdAt: new Date(),
+            },
           },
         },
-      },
-      { new: true }
-    )
-      .lean()
-      .exec();
+        { upsert: true, new: true }
+      ).lean();
 
-    return updated;
+      return newFriend;
+    } catch (error) {
+      console.error("Error in saveFriend:", error);
+      throw error;
+    }
+  }
+
+  async addNotification(userId: string, notification: any): Promise<void> {
+    try {
+      await UserNotificationsModel.findOneAndUpdate(
+        { userId: new mongoose.Types.ObjectId(userId) },
+        {
+          $push: {
+            notifications: notification,
+          },
+        },
+        { upsert: true, new: true }
+      );
+    } catch (error) {
+      console.error("Error in addNotification:", error);
+      throw error;
+    }
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return UserModel.findById(id).lean().exec();
   }
 
   async fetchFriends(userId: string): Promise<Friend | null> {
@@ -109,7 +112,15 @@ class FriendRepository implements FriendRepo {
         return null;
       }
 
-      const friendIds = friendsDoc.friends.map((friend) => friend.friendId);
+      const acceptedFriends = friendsDoc.friends.filter(
+        (friend) => friend.status === "accepted"
+      );
+
+      if (acceptedFriends.length === 0) {
+        return null;
+      }
+
+      const friendIds = acceptedFriends.map((friend) => friend.friendId);
 
       const friends = await UserModel.aggregate([
         { $match: { _id: { $in: friendIds } } },
@@ -185,10 +196,112 @@ class FriendRepository implements FriendRepo {
       )
         .lean()
         .exec();
+      await FriendModel.findOneAndUpdate(
+        { userId: friendId },
+        {
+          $pull: {
+            friends: { friendId: new mongoose.Types.ObjectId(userId) },
+          },
+        },
+        { new: true }
+      )
+        .lean()
+        .exec();
 
       return updatedFriend;
     } catch (error) {
       console.error("Error in removeFriend repository:", error);
+      throw error;
+    }
+  }
+
+  async acceptFriendRequest(
+    userId: string,
+    friendId: string
+  ): Promise<Friend | null> {
+    try {
+      const userFriend = await FriendModel.findOneAndUpdate(
+        { userId: userId },
+        {
+          $addToSet: {
+            friends: {
+              friendId: new mongoose.Types.ObjectId(friendId),
+              status: "accepted",
+              createdAt: new Date(),
+            },
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      console.log(userFriend);
+
+      await FriendModel.findOneAndUpdate(
+        {
+          userId: friendId,
+          "friends.friendId": new mongoose.Types.ObjectId(userId),
+        },
+        {
+          $set: { "friends.$.status": "accepted" },
+        }
+      );
+
+      await UserNotificationsModel.findOneAndUpdate(
+        { userId: userId },
+        {
+          $pull: {
+            notifications: {
+              _id: new mongoose.Types.ObjectId(friendId),
+            },
+          },
+        }
+      );
+
+      return userFriend;
+    } catch (error) {
+      console.error("Error in acceptFriendRequest:", error);
+      throw error;
+    }
+  }
+
+  async rejectFriendRequest(
+    userId: string,
+    friendId: string
+  ): Promise<Friend | null> {
+    try {
+      const updatedFriend = await FriendModel.findOneAndUpdate(
+        { userId: userId },
+        {
+          $pull: {
+            friends: { friendId: new mongoose.Types.ObjectId(friendId) },
+          },
+        },
+        { new: true }
+      ).lean();
+
+      await FriendModel.findOneAndUpdate(
+        { userId: friendId },
+        {
+          $pull: {
+            friends: { friendId: new mongoose.Types.ObjectId(userId) },
+          },
+        }
+      );
+
+      await UserNotificationsModel.findOneAndUpdate(
+        { userId: userId },
+        {
+          $pull: {
+            notifications: {
+              _id: new mongoose.Types.ObjectId(friendId),
+            },
+          },
+        }
+      );
+
+      return updatedFriend;
+    } catch (error) {
+      console.log("Error rejecting friend request:", error);
       throw error;
     }
   }

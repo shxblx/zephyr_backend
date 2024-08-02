@@ -1,5 +1,8 @@
+import mongoose from "mongoose";
 import Otp from "../entities/otp";
 import User from "../entities/user";
+import UserNotifications from "../entities/userNotification";
+import UserNotificationsModel from "../frameworks/models/UserNotificationsModel";
 import OtpModel from "../frameworks/models/otpModel";
 import UserModel from "../frameworks/models/userModel";
 import UserRepo from "../usecase/interfaces/user/IuserRepo";
@@ -73,6 +76,27 @@ class UserRepository implements UserRepo {
     return UserModel.findOneAndUpdate({ _id: user._id }, updateData, {
       new: true,
     }).exec();
+  }
+
+  async fetchNotifications(userId: string): Promise<UserNotifications | null> {
+    try {
+      let objectId: mongoose.Types.ObjectId;
+      
+      try {
+        objectId = new mongoose.Types.ObjectId(userId);
+      } catch (error) {
+        console.error("Invalid userId format:", userId);
+        return null;
+      }
+  
+      const userNotifications = await UserNotificationsModel.findOne({ userId: objectId })
+        .lean()
+        .exec();
+      return userNotifications;
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      throw error;
+    }
   }
 }
 

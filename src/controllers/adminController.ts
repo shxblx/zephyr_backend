@@ -83,7 +83,6 @@ class AdminController {
   }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("here");
 
       res.cookie("adminJwt", "", {
         httpOnly: true,
