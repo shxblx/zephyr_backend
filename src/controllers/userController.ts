@@ -239,7 +239,6 @@ class UserController {
 
   async getNotification(req: Request, res: Response, next: NextFunction) {
     try {
-
       const notifications = await this._userUsecase.fetchNotifications(
         req.params.userId
       );
@@ -249,6 +248,19 @@ class UserController {
       } else {
         return res.status(notifications.status).json(notifications.message);
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async clearNotifications(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(req.body);
+
+      const cleared = await this._userUsecase.clearNotifications(
+        req.body.userId
+      );
+      return res.status(cleared.status).json(cleared.message);
     } catch (error) {
       next(error);
     }

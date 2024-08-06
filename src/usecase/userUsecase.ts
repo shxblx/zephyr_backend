@@ -603,6 +603,22 @@ class UserUsecase {
       };
     }
   }
+
+  async clearNotifications(userId: string) {
+    try {
+      await this._userRepository.clearNotifications(userId);
+      return {
+        status: 200,
+        message: "Notifications Cleared Successfully",
+      };
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      return {
+        status: 500,
+        message: "An error occurred while fetching notifications",
+      };
+    }
+  }
 }
 
 export default UserUsecase;

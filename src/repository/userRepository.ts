@@ -81,20 +81,43 @@ class UserRepository implements UserRepo {
   async fetchNotifications(userId: string): Promise<UserNotifications | null> {
     try {
       let objectId: mongoose.Types.ObjectId;
-      
+
       try {
         objectId = new mongoose.Types.ObjectId(userId);
       } catch (error) {
         console.error("Invalid userId format:", userId);
         return null;
       }
-  
-      const userNotifications = await UserNotificationsModel.findOne({ userId: objectId })
+
+      const userNotifications = await UserNotificationsModel.findOne({
+        userId: objectId,
+      })
         .lean()
         .exec();
       return userNotifications;
     } catch (error) {
       console.error("Error fetching notifications:", error);
+      throw error;
+    }
+  }
+
+  async clearNotifications(userId: string): Promise<void> {
+    try {
+      let objectId: mongoose.Types.ObjectId;
+
+      try {
+        objectId = new mongoose.Types.ObjectId(userId);
+      } catch (error) {
+        console.error("Invalid userId format:", userId);
+        throw new Error("Invalid userId format");
+      }
+
+      await UserNotificationsModel.updateOne(
+        { userId: objectId },
+        { $set: { notifications: [] } }
+      ).exec();
+    } catch (error) {
+      console.error("Error clearing notifications:", error);
       throw error;
     }
   }

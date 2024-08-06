@@ -11,6 +11,7 @@ import userRouter from "../routes/userRoutes";
 import adminRouter from "../routes/adminRoutes";
 import friendRouter from "../routes/friendRoutes";
 import communityRouter from "../routes/communityRoutes";
+import zepchatRouter from "../routes/zepchatRoutes";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use(
 app.use("/user", userRouter);
 app.use("/user", friendRouter);
 app.use("/user", communityRouter);
+app.use("/user", zepchatRouter);
 app.use("/admin", adminRouter);
 
 io.on("connection", (socket) => {

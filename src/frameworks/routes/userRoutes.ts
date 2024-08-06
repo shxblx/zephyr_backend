@@ -96,6 +96,9 @@ userRouter.get("/getNotification/:userId", userAuth, (req, res, next) => {
   userController.getNotification(req, res, next);
 });
 
+userRouter.patch("/clearNotifications", userAuth, (req, res, next) => {
+  userController.clearNotifications(req, res, next);
+});
 userRouter.use(errorHandle);
 
 export default userRouter;

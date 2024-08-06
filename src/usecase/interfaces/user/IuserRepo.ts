@@ -3,7 +3,7 @@ import UserNotifications from "../../../entities/userNotification";
 
 interface UserRepo {
   findByEmail(email: string): Promise<User | null>;
-  findUserName(userName: string): Promise<User | null>
+  findUserName(userName: string): Promise<User | null>;
   saveUser(user: User): Promise<User | null>;
   saveOtp(
     email: string,
@@ -16,7 +16,8 @@ interface UserRepo {
   deleteOtpByEmail(email: string): Promise<any>;
   findById(id: string): Promise<User | null>;
   updateUser(user: User): Promise<User | null>;
-  fetchNotifications(userId: string): Promise<UserNotifications | null>
+  fetchNotifications(userId: string): Promise<UserNotifications | null>;
+  clearNotifications(userId: string): Promise<void>;
 }
 
 export default UserRepo;

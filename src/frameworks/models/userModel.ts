@@ -24,7 +24,7 @@ const userSchema: Schema<User & Document> = new Schema({
   },
   status: {
     type: String,
-    default: "Online"
+    default: "Online",
   },
   profilePicture: {
     type: String,
