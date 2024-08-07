@@ -161,6 +161,69 @@ class CommunityUsecase {
       return { status: 500, message: error.message };
     }
   }
+
+  async getCommunityById(communityId: string) {
+    try {
+      if (!communityId) {
+        return {
+          status: 400,
+          message: "CommunityId not Found",
+        };
+      }
+
+      const community = await this._communityRepository.getCommunityById(
+        communityId
+      );
+
+      if (community) {
+        return {
+          status: 200,
+          data: community,
+        };
+      } else {
+        return {
+          status: 400,
+          message: "Community not Found",
+        };
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+  async removeMember(userId: string, communityId: string) {
+    try {
+      if (!userId || !communityId) {
+        return {
+          status: 400,
+          message: "Data not found",
+        };
+      }
+
+      const memberRemoved = await this._communityRepository.removeMember(
+        userId,
+        communityId
+      );
+
+      if (memberRemoved) {
+        return {
+          status: 200,
+          message: "Member Removed Successfully",
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
 }
 
 export default CommunityUsecase;

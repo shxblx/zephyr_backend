@@ -172,6 +172,11 @@ class FriendUseCase {
           timestamp: new Date(),
         };
         await this._friendRepository.addNotification(friendId, notification);
+
+        const conversation = await this._friendRepository.createConversation(
+          userId,
+          friendId
+        );
       }
       return {
         status: 200,
@@ -179,7 +184,10 @@ class FriendUseCase {
       };
     } catch (error) {
       console.log("Error accepting friend request:", error);
-      throw error;
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
     }
   }
 
@@ -196,7 +204,91 @@ class FriendUseCase {
       };
     } catch (error) {
       console.log("Error rejecting friend request:", error);
-      throw error;
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async sendMessage(senderId: string, receiverId: string, content: string) {
+    try {
+      if (!senderId || !receiverId || !content) {
+        return {
+          status: 400,
+          message: "Data Not Found",
+        };
+      }
+
+      const conversation = await this._friendRepository.findConversation(
+        senderId,
+        receiverId
+      );
+
+      if (conversation) {
+        const conversationId = new mongoose.Types.ObjectId(conversation._id);
+
+        const message = await this._friendRepository.sendMessage(
+          conversationId,
+          senderId,
+          content
+        );
+
+        if (message) {
+          return {
+            status: 200,
+            message: "Message sent successfully",
+          };
+        }
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async getMessages(member1: string, member2: string) {
+    try {
+      if (!member1 || !member2) {
+        return {
+          status: 400,
+          message: "Data Not Found",
+        };
+      }
+
+      const conversation = await this._friendRepository.findConversation(
+        member1,
+        member2
+      );
+
+      if (conversation) {
+        const conversationId = conversation._id;
+
+        const messages = await this._friendRepository.findMessages(
+          conversationId
+        );
+
+        return {
+          status: 200,
+          data: messages,
+        };
+      }
+
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
     }
   }
 }

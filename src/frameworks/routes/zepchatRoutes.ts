@@ -42,6 +42,14 @@ zepchatRouter.patch("/voteZepchat", userAuth, (req, res, next) => {
   zepchatController.voteZepchat(req, res, next);
 });
 
+zepchatRouter.patch("/deleteZepchat", userAuth, (req, res, next) => {
+  zepchatController.deleteZepchat(req, res, next);
+});
+
+zepchatRouter.patch("/updateZepchat", userAuth, (req, res, next) => {
+  zepchatController.updateZepchat(req, res, next);
+});
+
 zepchatRouter.use(errorHandle);
 
 export default zepchatRouter;

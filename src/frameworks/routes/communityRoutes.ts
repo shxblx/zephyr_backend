@@ -46,6 +46,18 @@ communityRouter.get("/getMembers/:communityId", userAuth, (req, res, next) => {
   communityController.getMembers(req, res, next);
 });
 
+communityRouter.get(
+  "/getCommunityById/:communityId",
+  userAuth,
+  (req, res, next) => {
+    communityController.getCommunityById(req, res, next);
+  }
+);
+
+communityRouter.patch("/removeMember", userAuth, (req, res, next) => {
+  communityController.removeMember(req, res, next);
+});
+
 communityRouter.use(errorHandle);
 
 export default communityRouter;

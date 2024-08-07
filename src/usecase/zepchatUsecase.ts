@@ -31,7 +31,7 @@ class ZepchatUseCase {
         };
       }
 
-      const user = await this._zepchatRepository.findById(userId);
+      const user = await this._zepchatRepository.findUserById(userId);
       if (!user) {
         return {
           status: 404,
@@ -111,7 +111,7 @@ class ZepchatUseCase {
         };
       }
 
-      const user = await this._zepchatRepository.findById(userId);
+      const user = await this._zepchatRepository.findUserById(userId);
       if (!user) {
         return {
           status: 404,
@@ -367,9 +367,7 @@ class ZepchatUseCase {
           };
       }
 
-      const savedZepchat = await this._zepchatRepository.voteZepchatSave(
-        zepchat
-      );
+      const savedZepchat = await this._zepchatRepository.ZepchatSave(zepchat);
 
       if (!savedZepchat) {
         return {
@@ -385,6 +383,109 @@ class ZepchatUseCase {
       };
     } catch (error) {
       console.error("Error in voteZepchat:", error);
+      return {
+        status: 500,
+        message: "Something Went Wrong",
+      };
+    }
+  }
+
+  async deleteZepchat(zepchatId: string, userId: string) {
+    try {
+      if (!zepchatId) {
+        return {
+          status: 400,
+          message: "id not found ",
+        };
+      }
+
+      const zepchat = await this._zepchatRepository.fetchZepchatById(zepchatId);
+
+      if (!zepchat) {
+        return {
+          status: 400,
+          message: "Zepchat not found",
+        };
+      }
+      const user = new mongoose.Types.ObjectId(userId);
+
+      if (zepchat.author._id.toString() !== user.toString()) {
+        return {
+          status: 400,
+          message: "IDs mismatch",
+        };
+      }
+      const deleteZepchat = await this._zepchatRepository.deleteZepchat(
+        zepchatId
+      );
+
+      if (deleteZepchat) {
+        const clearReplies = await this._zepchatRepository.clearReplies(
+          zepchatId
+        );
+
+        if (clearReplies) {
+          return {
+            status: 200,
+            message: "Zepchat Deleted Successfully",
+          };
+        }
+      }
+
+      return {
+        status: 200,
+        message: "Zepchat deleted successfully",
+      };
+    } catch (error) {
+      console.error("An Error occured:", error);
+      return {
+        status: 500,
+        message: "Something Went Wrong",
+      };
+    }
+  }
+
+  async updateZepchat(
+    zepchatId: string,
+    title?: string,
+    content?: string,
+    tags?: string[]
+  ) {
+    try {
+      if (!zepchatId) {
+        return {
+          status: 400,
+          message: "ZepchatId not found",
+        };
+      }
+      const zepchat = await this._zepchatRepository.fetchZepchatById(zepchatId);
+
+      if (!zepchat) {
+        return {
+          status: 400,
+          message: "Zepchat not found",
+        };
+      }
+
+      if (title) {
+        zepchat.title = title;
+      }
+      if (content) {
+        zepchat.content = content;
+      }
+
+      if (tags) {
+        zepchat.tags = tags;
+      }
+
+      await this._zepchatRepository.ZepchatSave(zepchat);
+
+      return {
+        status: 200,
+        message: "Zepchat Edited Successfully",
+      };
+    } catch (error) {
+      console.error("An Error occured:", error);
       return {
         status: 500,
         message: "Something Went Wrong",

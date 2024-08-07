@@ -104,6 +104,36 @@ class ZepchatController {
       next(error);
     }
   }
+
+  async deleteZepchat(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { zepchatId, userId } = req.body;
+      const deleteZep = await this._zepchatUsecase.deleteZepchat(
+        zepchatId,
+        userId
+      );
+
+      return res.status(deleteZep.status).json(deleteZep.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateZepchat(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { zepchatId, title, content, tags } = req.body;
+      const deleteZep = await this._zepchatUsecase.updateZepchat(
+        zepchatId,
+        title,
+        content,
+        tags
+      );
+
+      return res.status(deleteZep.status).json(deleteZep.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default ZepchatController;

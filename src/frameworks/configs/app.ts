@@ -67,4 +67,22 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`Socket ${socket.id} disconnected`);
   });
+  socket.on("joinCommunity", ({ communityId }) => {
+    socket.join(communityId);
+    console.log(`Socket ${socket.id} joined community ${communityId}`);
+  });
+
+  socket.on("leaveCommunity", ({ communityId }) => {
+    socket.leave(communityId);
+    console.log(`Socket ${socket.id} left community ${communityId}`);
+  });
+
+  socket.on("sendCommunityMessage", ({ communityId, message }) => {
+    console.log(`Received message in community ${communityId}:`, message);
+    io.to(communityId).emit("newCommunityMessage", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`Socket ${socket.id} disconnected`);
+  });
 });

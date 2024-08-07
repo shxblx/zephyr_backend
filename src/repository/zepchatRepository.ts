@@ -16,7 +16,7 @@ class ZepchatRepository {
     return await zepChatModel.find();
   }
 
-  async findById(userId: string): Promise<User | null> {
+  async findUserById(userId: string): Promise<User | null> {
     const user = await UserModel.findById(userId).exec();
     return user;
   }
@@ -43,10 +43,19 @@ class ZepchatRepository {
     return updateVote.save();
   }
 
-  async voteZepchatSave(zepchat: Zepchat): Promise<Zepchat | null> {
+  async ZepchatSave(zepchat: Zepchat): Promise<Zepchat | null> {
     const updateVote = new ZepchatModel(zepchat);
     return updateVote.save();
   }
+
+  async deleteZepchat(zepchatId: string): Promise<any> {
+    return await ZepchatModel.deleteOne({ _id: zepchatId });
+  }
+
+  async clearReplies(zepchatId: string): Promise<any> {
+    return await ZepReplyModel.deleteMany({ zepChatId: zepchatId });
+  }
+
 }
 
 export default ZepchatRepository;

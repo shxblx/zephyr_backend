@@ -255,8 +255,6 @@ class UserController {
 
   async clearNotifications(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(req.body);
-
       const cleared = await this._userUsecase.clearNotifications(
         req.body.userId
       );

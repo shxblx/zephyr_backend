@@ -44,6 +44,13 @@ friendRouter.patch("/rejectFriendRequest", userAuth, (req, res, next) => {
   friendController.rejectFriendRequest(req, res, next);
 });
 
+friendRouter.post("/sendMessage", userAuth, (req, res, next) => {
+  friendController.sendMessage(req, res, next);
+});
+friendRouter.get("/fetchMessages/:membersId", userAuth, (req, res, next) => {
+  friendController.fetchMessages(req, res, next);
+});
+
 friendRouter.use(errorHandle);
 
 export default friendRouter;

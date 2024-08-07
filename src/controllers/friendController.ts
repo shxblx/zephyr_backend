@@ -99,6 +99,40 @@ class FriendController {
       next(error);
     }
   }
+  async sendMessage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { senderId, receiverId, content } = req.body;
+      const messageSend = await this._friendUsecase.sendMessage(
+        senderId,
+        receiverId,
+        content
+      );
+
+      return res.status(messageSend.status).json(messageSend.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async fetchMessages(req: Request, res: Response, next: NextFunction) {
+    try {
+      const membersId = req.params.membersId;
+      const [member1, member2] = membersId.split("-");
+
+      if (!member1 || !member2) {
+        return res.status(400).json({ error: "Invalid membersId format" });
+      }
+
+      const messages = await this._friendUsecase.getMessages(member1, member2);
+
+      if (messages.status === 200) {
+        return res.status(messages.status).json(messages.data);
+      }
+      return res.status(messages.status).json(messages.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default FriendController;

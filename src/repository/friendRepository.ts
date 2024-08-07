@@ -5,6 +5,10 @@ import FriendRepo from "../usecase/interfaces/friends/IfriendsRepo";
 import Friend from "../entities/friends";
 import FriendModel from "../frameworks/models/friendModel";
 import UserNotificationsModel from "../frameworks/models/UserNotificationsModel";
+import conversationModel from "../frameworks/models/conversationModel";
+import Conversation from "../entities/conversation";
+import MessageModel from "../frameworks/models/messageModel";
+import Message from "../entities/message";
 
 class FriendRepository implements FriendRepo {
   async getGfriends(
@@ -234,8 +238,6 @@ class FriendRepository implements FriendRepo {
         { upsert: true, new: true }
       );
 
-      console.log(userFriend);
-
       await FriendModel.findOneAndUpdate(
         {
           userId: friendId,
@@ -302,6 +304,98 @@ class FriendRepository implements FriendRepo {
       return updatedFriend;
     } catch (error) {
       console.log("Error rejecting friend request:", error);
+      throw error;
+    }
+  }
+
+  async createConversation(
+    member1: string,
+    member2: string
+  ): Promise<Conversation | null> {
+    try {
+      const newConversation = new conversationModel({
+        members: [
+          { userId: new mongoose.Types.ObjectId(member1) },
+          { userId: new mongoose.Types.ObjectId(member2) },
+        ],
+        isGroup: false,
+      });
+
+      const savedConversation = await newConversation.save();
+      return savedConversation;
+    } catch (error) {
+      console.error("Error in createConversation:", error);
+      throw error;
+    }
+  }
+
+  async findConversation(
+    senderId: string,
+    receiverId: string
+  ): Promise<Conversation | null> {
+    try {
+      const conversation = await conversationModel.findOne({
+        members: {
+          $all: [
+            { $elemMatch: { userId: new mongoose.Types.ObjectId(senderId) } },
+            { $elemMatch: { userId: new mongoose.Types.ObjectId(receiverId) } },
+          ],
+        },
+        isGroup: false,
+      });
+
+      return conversation;
+    } catch (error) {
+      console.error("Error in findConversation:", error);
+      throw error;
+    }
+  }
+
+  async sendMessage(
+    conversationId: mongoose.Types.ObjectId,
+    senderId: string,
+    content: string
+  ): Promise<any> {
+    try {
+      const newMessage = new MessageModel({
+        conversationId: new mongoose.Types.ObjectId(conversationId),
+        sender: new mongoose.Types.ObjectId(senderId),
+        content: content,
+      });
+
+      const savedMessage = await newMessage.save();
+
+      await conversationModel.findByIdAndUpdate(conversationId, {
+        $set: { updatedAt: new Date() },
+      });
+
+      return savedMessage;
+    } catch (error) {
+      console.error("Error in sendMessage:", error);
+      throw error;
+    }
+  }
+
+  async findMessages(
+    conversationId: mongoose.Types.ObjectId | undefined
+  ): Promise<Message[]> {
+    try {
+      if (conversationId) {
+        if (!mongoose.Types.ObjectId.isValid(conversationId)) {
+          throw new Error("Invalid conversation ID");
+        }
+      }
+
+      const messages = await MessageModel.find({
+        conversationId: new mongoose.Types.ObjectId(conversationId),
+      })
+        .sort({ createdAt: 1 })
+        .lean()
+        .exec();
+
+      return messages;
+    } catch (error) {
+      console.error("Error in findMessages:", error);
       throw error;
     }
   }

@@ -176,19 +176,57 @@ class CommunityRepository implements CommunityRepo {
     }
   }
 
-  async getCommunityMembers(communityId: string): Promise<any> {
+  async getCommunityMembers(
+    communityId: string
+  ): Promise<{ members: User[]; admin: User }> {
     try {
       const communityMembers = await CommunityMemberModel.findOne({
         communityId,
       })
-        .populate("members.userId")
+        .populate<{ members: { userId: User }[]; admin: { userId: User } }>(
+          "members.userId admin.userId"
+        )
         .exec();
 
       if (!communityMembers) {
         throw new Error("Community not found");
       }
 
-      return communityMembers.members.map((member) => member.userId);
+      const members = communityMembers.members.map((member) => member.userId);
+      const admin = communityMembers.admin.userId;
+
+      return { members, admin };
+    } catch (error: any) {
+      throw new Error(`Error fetching community members: ${error.message}`);
+    }
+  }
+
+  async getCommunityById(communityId: string): Promise<Community | null> {
+    try {
+      const community = await CommunityModel.findOne({ _id: communityId });
+      return community;
+    } catch (error: any) {
+      throw new Error(`Error fetching community members: ${error.message}`);
+    }
+  }
+
+  async removeMember(
+    userId: string,
+    communityId: string
+  ): Promise<CommunityMembers | null> {
+    try {
+      const removedMember = await CommunityMemberModel.findOneAndUpdate(
+        { communityId: communityId },
+        {
+          $pull: {
+            members: { userId: new mongoose.Types.ObjectId(userId) },
+          },
+        },
+        { new: true }
+      )
+        .lean()
+        .exec();
+      return removedMember;
     } catch (error: any) {
       throw new Error(`Error fetching community members: ${error.message}`);
     }

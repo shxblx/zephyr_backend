@@ -113,6 +113,34 @@ class CommunityController {
       next(error);
     }
   }
+
+  async getCommunityById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const communityId = req.params.communityId;
+
+      const community = await this._commuityUsecase.getCommunityById(
+        communityId
+      );
+
+      if (community.status === 200) {
+        return res.status(community.status).json(community.data);
+      }
+      return res.status(community.status).json(community.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async removeMember(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, communityId } = req.body;
+      const removed = await this._commuityUsecase.removeMember(
+        userId,
+        communityId
+      );
+      return res.status(removed?.status).json(removed?.message);
+    } catch (error) {}
+  }
 }
 
 export default CommunityController;
