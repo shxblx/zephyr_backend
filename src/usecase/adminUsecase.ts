@@ -64,16 +64,15 @@ class AdminUsecase {
       } else {
         return {
           status: 400,
-          message: "Failed to retrieve data"
-        }
+          message: "Failed to retrieve data",
+        };
       }
     } catch (error) {
       return {
         status: 500,
-        message: "An error Occured"
-      }
+        message: "An error Occured",
+      };
       console.log(error);
-
     }
   }
 
@@ -101,7 +100,7 @@ class AdminUsecase {
 
   async unblockUser(userId: string) {
     try {
-      const user = await this._adminRepository.findById(userId)
+      const user = await this._adminRepository.findById(userId);
       if (user) {
         user.isBlocked = false;
         await this._adminRepository.saveUser(user);
@@ -125,9 +124,9 @@ class AdminUsecase {
     try {
       const communities = await this._adminRepository.fetchCommunities();
       if (!communities) {
-        return { status: 400, message: "No Communities Found" }
+        return { status: 400, message: "No Communities Found" };
       }
-      return { status: 200, communities }
+      return { status: 200, communities };
     } catch (error) {
       throw error;
     }
@@ -135,10 +134,14 @@ class AdminUsecase {
 
   async banCommunity(communityId: string) {
     try {
-      const community = await this._adminRepository.findCommunityById(communityId);
+      const community = await this._adminRepository.findCommunityById(
+        communityId
+      );
       if (community) {
         community.isBanned = true;
-        const updatedCommunity = await this._adminRepository.saveCommunity(community);
+        const updatedCommunity = await this._adminRepository.saveCommunity(
+          community
+        );
         if (updatedCommunity) {
           return { status: 200 };
         } else {
@@ -155,10 +158,14 @@ class AdminUsecase {
 
   async unbanCommunity(communityId: string) {
     try {
-      const community = await this._adminRepository.findCommunityById(communityId);
+      const community = await this._adminRepository.findCommunityById(
+        communityId
+      );
       if (community) {
         community.isBanned = false;
-        const updatedCommunity = await this._adminRepository.saveCommunity(community);
+        const updatedCommunity = await this._adminRepository.saveCommunity(
+          community
+        );
         if (updatedCommunity) {
           return { status: 200 };
         } else {
@@ -173,6 +180,54 @@ class AdminUsecase {
     }
   }
 
+  async getUserInfo(userId: string) {
+    try {
+      if (!userId) {
+        return {
+          status: 400,
+          message: "Data not Found",
+        };
+      }
+
+      const user = await this._adminRepository.findById(userId);
+
+      if (user) {
+        return {
+          status: 200,
+          data: user,
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internel Server error",
+      };
+    }
+  }
+
+  async getReports() {
+    try {
+      const reports = await this._adminRepository.fetchReports();
+
+      if (reports) {
+        return {
+          status: 200,
+          data: reports,
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {   return {
+      status: 500,
+      message: "Internel Server error",
+    };}
+  }
 }
 
 export default AdminUsecase;

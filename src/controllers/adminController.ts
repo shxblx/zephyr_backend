@@ -83,7 +83,6 @@ class AdminController {
   }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-
       res.cookie("adminJwt", "", {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "development",
@@ -114,6 +113,30 @@ class AdminController {
         req.body.communityId
       );
       return res.status(unbanCommunity.status).json(unbanCommunity.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getUserInfo(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.userId;
+      const user = await this._adminUsecase.getUserInfo(userId);
+      if (user.status === 200) {
+        return res.status(user.status).json(user.data);
+      }
+      return res.status(user.status).json(user.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getReports(req: Request, res: Response, next: NextFunction) {
+    try {
+      const reports = await this._adminUsecase.getReports();
+      if (reports.status === 200) {
+        return res.status(reports.status).json(reports.data);
+      }
+      return res.status(reports.status).json(reports.message);
     } catch (error) {
       next(error);
     }

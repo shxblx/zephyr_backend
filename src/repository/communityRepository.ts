@@ -5,6 +5,11 @@ import CommunityMemberModel from "../frameworks/models/CommunityMembers";
 import CommunityModel from "../frameworks/models/communityModel";
 import CommunityRepo from "../usecase/interfaces/community/IcommunityRepo";
 import User from "../entities/user";
+import CommunityMessage from "../entities/communityMessage";
+import CommunityMessageModel from "../frameworks/models/communityMessageModel";
+import UserModel from "../frameworks/models/userModel";
+import CommunityReports from "../entities/communityReport";
+import CommunityReportsModel from "../frameworks/models/communityReportModel";
 
 class CommunityRepository implements CommunityRepo {
   async createCommunity(communityData: Community): Promise<any> {
@@ -229,6 +234,99 @@ class CommunityRepository implements CommunityRepo {
       return removedMember;
     } catch (error: any) {
       throw new Error(`Error fetching community members: ${error.message}`);
+    }
+  }
+
+  async sendCommunityMessage(
+    communityId: string,
+    sender: string,
+    userName: string,
+    profilePicture: string,
+    content: string
+  ): Promise<CommunityMessage> {
+    try {
+      const newMessage = new CommunityMessageModel({
+        communityId: new mongoose.Types.ObjectId(communityId),
+        sender: new mongoose.Types.ObjectId(sender),
+        userName,
+        profilePicture,
+        content,
+      });
+
+      const savedMessage = await newMessage.save();
+      return savedMessage;
+    } catch (error) {
+      console.error("Error in sendCommunityMessage:", error);
+      throw error;
+    }
+  }
+
+  async getCommunityMessages(communityId: string): Promise<CommunityMessage[]> {
+    try {
+      const messages = await CommunityMessageModel.find({ communityId })
+        .sort({ createdAt: 1 })
+        .lean()
+        .exec();
+      return messages;
+    } catch (error) {
+      console.error("Error in getCommunityMessages:", error);
+      throw error;
+    }
+  }
+
+  async updateCommunity(
+    name: string,
+    description: string,
+    tags: string[],
+    communityId: string
+  ): Promise<Community | null> {
+    try {
+      const updatedCommunity = await CommunityModel.findByIdAndUpdate(
+        communityId,
+        {
+          $set: {
+            name: name,
+            description: description,
+            hashtags: tags,
+          },
+        },
+        { new: true, runValidators: true }
+      ).lean();
+
+      return updatedCommunity;
+    } catch (error) {
+      console.error("Error in updateCommunity repository:", error);
+      throw error;
+    }
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return UserModel.findById(id).lean().exec();
+  }
+
+  async reportCommunity(
+    reporterUsername: string,
+    reportedCommunityName: string,
+    reporterId: string,
+    reportedUserId: string,
+    subject: string,
+    reason: string
+  ): Promise<CommunityReports> {
+    try {
+      const newReport = new CommunityReportsModel({
+        reporterId: new mongoose.Types.ObjectId(reporterId),
+        reportedCommunityId: new mongoose.Types.ObjectId(reportedUserId),
+        reporterUser: reporterUsername,
+        reportedCommunity: reportedCommunityName,
+        subject,
+        reason,
+      });
+
+      const savedReport = await newReport.save();
+      return savedReport;
+    } catch (error) {
+      console.error("Error in reportFriend:", error);
+      throw error;
     }
   }
 }

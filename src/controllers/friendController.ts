@@ -133,6 +133,23 @@ class FriendController {
       next(error);
     }
   }
+
+  async reportUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { reporterId, reportedUserId, subject, reason } = req.body;
+      console.log("here");
+
+      const report = await this._friendUsecase.reportUser(
+        reporterId,
+        reportedUserId,
+        subject,
+        reason
+      );
+      return res.status(report.status).json(report.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default FriendController;

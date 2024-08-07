@@ -139,7 +139,74 @@ class CommunityController {
         communityId
       );
       return res.status(removed?.status).json(removed?.message);
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async sendCommunityMessage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { communityId, sender, userName, profilePicture, content } =
+        req.body;
+
+      const message = await this._commuityUsecase.sendCommunityMessage(
+        communityId,
+        sender,
+        userName,
+        profilePicture,
+        content
+      );
+
+      return res.status(message.status).json(message.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCommunityMessages(req: Request, res: Response, next: NextFunction) {
+    try {
+      const messages = await this._commuityUsecase.getCommunityMessages(
+        req.params.communityId
+      );
+
+      if (messages.status === 200) {
+        return res.status(messages.status).json(messages.data);
+      }
+      return res.status(messages.status).json(messages.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateCommunity(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { name, description, tags, communityId } = req.body;
+      const changed = await this._commuityUsecase.updateCommunity(
+        name,
+        description,
+        tags,
+        communityId
+      );
+
+      return res.status(changed.status).json(changed.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async communityReport(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { reporterId, reportedCommunityId, subject, reason } = req.body;
+      const changed = await this._commuityUsecase.communityReport(
+        reporterId,
+        reportedCommunityId,
+        subject,
+        reason
+      );
+
+      return res.status(changed.status).json(changed.message);
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

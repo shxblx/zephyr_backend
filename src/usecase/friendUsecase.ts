@@ -291,6 +291,54 @@ class FriendUseCase {
       };
     }
   }
+
+  async reportUser(
+    reporterId: string,
+    reportedUserId: string,
+    subject: string,
+    reason: string
+  ) {
+    try {
+      const reporter = await this._friendRepository.findById(reporterId);
+      const reportedUser = await this._friendRepository.findById(
+        reportedUserId
+      );
+
+      if (!reporter || !reportedUser) {
+        return {
+          status: 400,
+          message: "User not Found",
+        };
+      }
+      const reporterUsername = reporter?.userName;
+      const reportedUsername = reportedUser?.userName;
+
+      const report = await this._friendRepository.reportFriend(
+        reporterUsername,
+        reportedUsername,
+        reporterId,
+        reportedUserId,
+        subject,
+        reason
+      );
+
+      if (report) {
+        return {
+          status: 200,
+          message: "Successfully reported user",
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
 }
 
 export default FriendUseCase;

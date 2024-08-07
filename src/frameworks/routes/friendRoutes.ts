@@ -50,6 +50,9 @@ friendRouter.post("/sendMessage", userAuth, (req, res, next) => {
 friendRouter.get("/fetchMessages/:membersId", userAuth, (req, res, next) => {
   friendController.fetchMessages(req, res, next);
 });
+friendRouter.post("/reportUser", userAuth, (req, res, next) => {
+  friendController.reportUser(req, res, next);
+});
 
 friendRouter.use(errorHandle);
 

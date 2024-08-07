@@ -6,6 +6,7 @@ import EncryptPassword from "../utils/bcryptPassword";
 import JWTToken from "../utils/generateToken";
 import errorHandle from "../middlewares/errorHandle";
 import adminAuth from "../middlewares/adminAuth"; // Import middleware
+import userAuth from "../middlewares/userAuth";
 
 const adminRouter = express.Router();
 
@@ -47,6 +48,13 @@ adminRouter.post("/banCommunity", adminAuth, (req, res, next) => {
 
 adminRouter.post("/unbanCommunity", adminAuth, (req, res, next) => {
   adminController.unbanCommunity(req, res, next);
+});
+
+adminRouter.get("/getUserInfo/:userId", userAuth, (req, res, next) => {
+  adminController.getUserInfo(req, res, next);
+});
+adminRouter.get("/getReports", userAuth, (req, res, next) => {
+  adminController.getReports(req, res, next);
 });
 
 adminRouter.use(errorHandle);

@@ -58,6 +58,26 @@ communityRouter.patch("/removeMember", userAuth, (req, res, next) => {
   communityController.removeMember(req, res, next);
 });
 
+communityRouter.post("/sendCommunityMessage", userAuth, (req, res, next) => {
+  communityController.sendCommunityMessage(req, res, next);
+});
+
+communityRouter.get(
+  "/getCommunityMessages/:communityId",
+  userAuth,
+  (req, res, next) => {
+    communityController.getCommunityMessages(req, res, next);
+  }
+);
+
+communityRouter.patch("/updateCommunity", userAuth, (req, res, next) => {
+  communityController.updateCommunity(req, res, next);
+});
+
+communityRouter.post("/communityReport", userAuth, (req, res, next) => {
+  communityController.communityReport(req, res, next);
+});
+
 communityRouter.use(errorHandle);
 
 export default communityRouter;

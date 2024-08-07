@@ -224,6 +224,160 @@ class CommunityUsecase {
       };
     }
   }
+
+  async sendCommunityMessage(
+    communityId: string,
+    sender: string,
+    userName: string,
+    profilePicture: string,
+    content: string
+  ) {
+    try {
+      if (!communityId || !sender || !userName || !profilePicture || !content) {
+        return {
+          status: 400,
+          message: "Data Not Found",
+        };
+      }
+
+      const message = await this._communityRepository.sendCommunityMessage(
+        communityId,
+        sender,
+        userName,
+        profilePicture,
+        content
+      );
+
+      if (message) {
+        return {
+          status: 200,
+          message: "Message Sent Successfully",
+        };
+      }
+
+      return {
+        status: 400,
+        message: "Something Went Wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async getCommunityMessages(communityId: string) {
+    try {
+      if (!communityId) {
+        return {
+          status: 400,
+          message: "Data not Found",
+        };
+      }
+
+      const messages = await this._communityRepository.getCommunityMessages(
+        communityId
+      );
+
+      if (messages) {
+        return {
+          status: 200,
+          data: messages,
+        };
+      }
+
+      return {
+        status: 400,
+        message: "Something Went Wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async updateCommunity(
+    name: string,
+    description: string,
+    tags: string[],
+    communityId: string
+  ) {
+    try {
+      const updated = await this._communityRepository.updateCommunity(
+        name,
+        description,
+        tags,
+        communityId
+      );
+
+      if (updated) {
+        return {
+          status: 200,
+          message: "Community Updated Successfully",
+        };
+      }
+      return {
+        status: 400,
+        message: "Something Went Wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async communityReport(
+    reporterId: string,
+    reportedCommunityId: string,
+    subject: string,
+    reason: string
+  ) {
+    try {
+      const reporter = await this._communityRepository.findById(reporterId);
+      const reportedCommunity =
+        await this._communityRepository.getCommunityById(reportedCommunityId);
+
+      if (!reporter || !reportedCommunity) {
+        return {
+          status: 400,
+          message: "User not Found",
+        };
+      }
+
+      const reporterUsername = reporter?.userName;
+      const reportedCommunityName = reportedCommunity?.name;
+
+      const report = await this._communityRepository.reportCommunity(
+        reporterUsername,
+        reportedCommunityName,
+        reporterId,
+        reportedCommunityId,
+        subject,
+        reason
+      );
+
+      if (report) {
+        return {
+          status: 200,
+          message: "Successfully reported Community",
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
 }
 
 export default CommunityUsecase;

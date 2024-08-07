@@ -9,6 +9,8 @@ import conversationModel from "../frameworks/models/conversationModel";
 import Conversation from "../entities/conversation";
 import MessageModel from "../frameworks/models/messageModel";
 import Message from "../entities/message";
+import Reports from "../entities/reports";
+import ReportModel from "../frameworks/models/reportModel";
 
 class FriendRepository implements FriendRepo {
   async getGfriends(
@@ -396,6 +398,35 @@ class FriendRepository implements FriendRepo {
       return messages;
     } catch (error) {
       console.error("Error in findMessages:", error);
+      throw error;
+    }
+  }
+
+  async reportFriend(
+    reporterUsername: string,
+    reportedUsername: string,
+    reporterId: string,
+    reportedUserId: string,
+    subject: string,
+    reason: string
+  ): Promise<Reports> {
+    try {
+      console.log(reportedUsername);
+
+      const newReport = new ReportModel({
+        reporterId: new mongoose.Types.ObjectId(reporterId),
+        reportedUserId: new mongoose.Types.ObjectId(reportedUserId),
+        reporterUser: reporterUsername,
+        reportedUser: reportedUsername,
+        subject,
+        reason,
+      });
+      console.log(newReport);
+
+      const savedReport = await newReport.save();
+      return savedReport;
+    } catch (error) {
+      console.error("Error in reportFriend:", error);
       throw error;
     }
   }

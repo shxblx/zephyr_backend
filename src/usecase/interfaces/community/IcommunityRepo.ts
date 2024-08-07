@@ -24,6 +24,13 @@ interface CommunityRepo {
     userId: string,
     communityId: string
   ): Promise<CommunityMembers | null>;
+  updateCommunity(
+    name: string,
+    description: string,
+    tags: string[],
+    communityId: string
+  ): Promise<Community | null>;
+  findById(id: string): Promise<User | null>
 }
 
 export default CommunityRepo;

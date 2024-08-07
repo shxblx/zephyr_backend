@@ -1,6 +1,8 @@
 import Community from "../entities/community";
+import Reports from "../entities/reports";
 import User from "../entities/user";
 import CommunityModel from "../frameworks/models/communityModel";
+import ReportModel from "../frameworks/models/reportModel";
 import UserModel from "../frameworks/models/userModel";
 import AdminRepo from "../usecase/interfaces/admin/IadminRepo";
 
@@ -63,6 +65,16 @@ class AdminRepository implements AdminRepo {
       return updatedCommunity as Community;
     } catch (error) {
       console.error("Error saving community:", error);
+      throw error;
+    }
+  }
+
+  async fetchReports(): Promise<Reports[]> {
+    try {
+      const reports = await ReportModel.find().lean();
+      return reports as Reports[];
+    } catch (error) {
+      console.error("Error in fetchReports:", error);
       throw error;
     }
   }
