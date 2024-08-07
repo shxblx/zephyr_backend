@@ -141,6 +141,17 @@ class AdminController {
       next(error);
     }
   }
+  async getCommunityReports(req: Request, res: Response, next: NextFunction) {
+    try {
+      const reports = await this._adminUsecase.getCommunityReports();
+      if (reports.status === 200) {
+        return res.status(reports.status).json(reports.data);
+      }
+      return res.status(reports.status).json(reports.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default AdminController;

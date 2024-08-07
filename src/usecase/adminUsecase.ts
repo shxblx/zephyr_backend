@@ -223,10 +223,33 @@ class AdminUsecase {
         status: 400,
         message: "Something went wrong",
       };
-    } catch (error) {   return {
-      status: 500,
-      message: "Internel Server error",
-    };}
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internel Server error",
+      };
+    }
+  }
+  async getCommunityReports() {
+    try {
+      const reports = await this._adminRepository.fetchCommunityReports();
+
+      if (reports) {
+        return {
+          status: 200,
+          data: reports,
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internel Server error",
+      };
+    }
   }
 }
 

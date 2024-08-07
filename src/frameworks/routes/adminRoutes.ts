@@ -56,6 +56,9 @@ adminRouter.get("/getUserInfo/:userId", userAuth, (req, res, next) => {
 adminRouter.get("/getReports", userAuth, (req, res, next) => {
   adminController.getReports(req, res, next);
 });
+adminRouter.get("/getCommunityReports", userAuth, (req, res, next) => {
+  adminController.getCommunityReports(req, res, next);
+});
 
 adminRouter.use(errorHandle);
 

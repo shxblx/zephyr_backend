@@ -1,7 +1,9 @@
 import Community from "../entities/community";
+import CommunityReports from "../entities/communityReport";
 import Reports from "../entities/reports";
 import User from "../entities/user";
 import CommunityModel from "../frameworks/models/communityModel";
+import CommunityReportsModel from "../frameworks/models/communityReportModel";
 import ReportModel from "../frameworks/models/reportModel";
 import UserModel from "../frameworks/models/userModel";
 import AdminRepo from "../usecase/interfaces/admin/IadminRepo";
@@ -72,7 +74,16 @@ class AdminRepository implements AdminRepo {
   async fetchReports(): Promise<Reports[]> {
     try {
       const reports = await ReportModel.find().lean();
-      return reports as Reports[];
+      return reports;
+    } catch (error) {
+      console.error("Error in fetchReports:", error);
+      throw error;
+    }
+  }
+  async fetchCommunityReports(): Promise<CommunityReports[]> {
+    try {
+      const reports = await CommunityReportsModel.find().lean();
+      return reports;
     } catch (error) {
       console.error("Error in fetchReports:", error);
       throw error;
