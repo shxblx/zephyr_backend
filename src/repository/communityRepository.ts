@@ -329,6 +329,51 @@ class CommunityRepository implements CommunityRepo {
       throw error;
     }
   }
+
+  async makeAdmin(userId: string, communityId: string): Promise<boolean> {
+    try {
+      const userObjectId = new mongoose.Types.ObjectId(userId);
+      const communityObjectId = new mongoose.Types.ObjectId(communityId);
+
+      const currentCommunity = await CommunityMemberModel.findOne({
+        communityId: communityObjectId,
+      });
+
+      if (!currentCommunity) {
+        throw new Error("Community not found");
+      }
+
+      const currentAdminId = currentCommunity.admin.userId;
+
+      await CommunityMemberModel.updateOne(
+        { communityId: communityObjectId },
+        { $pull: { members: { userId: userObjectId } } }
+      );
+
+      const result = await CommunityMemberModel.findOneAndUpdate(
+        { communityId: communityObjectId },
+        {
+          $set: { "admin.userId": userObjectId },
+          $addToSet: {
+            members: {
+              userId: currentAdminId,
+              joinedAt: new Date(),
+            },
+          },
+        },
+        { new: true }
+      );
+
+      if (!result) {
+        throw new Error("Failed to update community");
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error in makeAdmin:", error);
+      throw error;
+    }
+  }
 }
 
 export default CommunityRepository;

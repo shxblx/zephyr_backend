@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import User from "../entities/user";
 import EncryptOtp from "../frameworks/utils/bcryptOtp";
 import EncryptPassword from "../frameworks/utils/bcryptPassword";
 import cloudinary from "../frameworks/utils/cloudinaryConfig";
+import GeminiChatbot from "../frameworks/utils/geminiApi";
 import GenerateOtp from "../frameworks/utils/generateOtp";
 import JWTToken from "../frameworks/utils/generateToken";
 import sendOtp from "../frameworks/utils/sendMail";
@@ -14,6 +16,7 @@ class UserUsecase {
   private _encryptOtp: EncryptOtp;
   private _generateMail: sendOtp;
   private _jwtToken: JWTToken;
+  private _geminiApi: GeminiChatbot;
 
   constructor(
     UserRepository: UserRepository,
@@ -21,7 +24,8 @@ class UserUsecase {
     encryptPassword: EncryptPassword,
     encryptOtp: EncryptOtp,
     generateMail: sendOtp,
-    jwtToken: JWTToken
+    jwtToken: JWTToken,
+    geminiApi: GeminiChatbot
   ) {
     this._userRepository = UserRepository;
     this._generateOtp = generateOtp;
@@ -29,6 +33,7 @@ class UserUsecase {
     this._encryptOtp = encryptOtp;
     this._generateMail = generateMail;
     this._jwtToken = jwtToken;
+    this._geminiApi = geminiApi;
   }
 
   async checkExist(email: string, userName: string) {
@@ -619,6 +624,31 @@ class UserUsecase {
       };
     }
   }
+
+  async chatWithBot(message: string) {
+    try {
+      const result = await this._geminiApi.sendMessage(message);
+      if (!result) {
+        return {
+          status: 400,
+          message: "Something Went Wrong",
+        };
+      }
+
+      return {
+        status: 200,
+        data: result,
+      };
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      return {
+        status: 500,
+        message: "An error occurred while fetching notifications",
+      };
+    }
+  }
+
+
 }
 
 export default UserUsecase;

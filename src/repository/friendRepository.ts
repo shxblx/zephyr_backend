@@ -11,6 +11,8 @@ import MessageModel from "../frameworks/models/messageModel";
 import Message from "../entities/message";
 import Reports from "../entities/reports";
 import ReportModel from "../frameworks/models/reportModel";
+import UserLocation from "../entities/userLocation";
+import UserLocationModel from "../frameworks/models/userLocationModel";
 
 class FriendRepository implements FriendRepo {
   async getGfriends(
@@ -427,6 +429,98 @@ class FriendRepository implements FriendRepo {
       return savedReport;
     } catch (error) {
       console.error("Error in reportFriend:", error);
+      throw error;
+    }
+  }
+
+  async findUserLocationData(userId: string): Promise<UserLocation | null> {
+    try {
+      const userLocation = UserLocationModel.findOne({ userId });
+      return userLocation;
+    } catch (error) {
+      console.error("Error in reportFriend:", error);
+      throw error;
+    }
+  }
+
+  async saveLocation(details: UserLocation): Promise<UserLocation> {
+    try {
+      const location = await UserLocationModel.findOneAndUpdate(
+        { userId: details.userId },
+        { $set: { location: details.location } },
+        { upsert: true, new: true }
+      );
+      return location;
+    } catch (error) {
+      console.error("Error saving location:", error);
+      throw error;
+    }
+  }
+
+  async findNearbyNonFriends(
+    userId: string,
+    longitude: number,
+    latitude: number,
+    maxDistance: number = 5000,
+    limit: number = 10 
+  ): Promise<UserLocation[]> {
+    try {
+      const currentUserFriends = await FriendModel.findOne({ userId: userId })
+        .select("friends.friendId")
+        .lean();
+
+      let friendIds: mongoose.Types.ObjectId[] = [];
+      if (currentUserFriends && currentUserFriends.friends) {
+        friendIds = currentUserFriends.friends.map((friend) => friend.friendId);
+      }
+
+      friendIds.push(new mongoose.Types.ObjectId(userId));
+
+      const nearbyUsers = await UserLocationModel.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [Number(longitude), Number(latitude)],
+            },
+            distanceField: "distance",
+            maxDistance: maxDistance,
+            spherical: true,
+          },
+        },
+        {
+          $match: {
+            userId: { $nin: friendIds },
+          },
+        },
+        {
+          $limit: limit,
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $unwind: "$userDetails",
+        },
+        {
+          $project: {
+            _id: "$userDetails._id",
+            userName: "$userDetails.userName",
+            displayName: "$userDetails.displayName",
+            profilePicture: "$userDetails.profilePicture",
+            distance: 1,
+          },
+        },
+      ]);
+
+      return nearbyUsers;
+    } catch (error) {
+      console.error("Error in findNearbyNonFriends:", error);
       throw error;
     }
   }

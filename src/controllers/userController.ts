@@ -263,6 +263,19 @@ class UserController {
       next(error);
     }
   }
+
+  async chatWithBot(req: Request, res: Response, next: NextFunction) {
+    try {
+      const message = req.body.message;
+      const answer = await this._userUsecase.chatWithBot(message);
+      if (answer.status === 200) {
+        return res.status(answer.status).json(answer.data);
+      }
+      return res.status(answer.status).json(answer.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default UserController;

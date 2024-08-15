@@ -6,6 +6,8 @@ import UserNotificationsModel from "../frameworks/models/UserNotificationsModel"
 import OtpModel from "../frameworks/models/otpModel";
 import UserModel from "../frameworks/models/userModel";
 import UserRepo from "../usecase/interfaces/user/IuserRepo";
+import UserLocation from "../entities/userLocation";
+import UserLocationModel from "../frameworks/models/userLocationModel";
 
 class UserRepository implements UserRepo {
   async findByEmail(email: string): Promise<User | null> {

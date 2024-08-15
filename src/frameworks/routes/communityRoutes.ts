@@ -78,6 +78,12 @@ communityRouter.post("/communityReport", userAuth, (req, res, next) => {
   communityController.communityReport(req, res, next);
 });
 
+communityRouter.post("/makeAdmin", userAuth, (req, res, next) => {
+  communityController.makeAdmin(req, res, next);
+});
+
+
+
 communityRouter.use(errorHandle);
 
 export default communityRouter;

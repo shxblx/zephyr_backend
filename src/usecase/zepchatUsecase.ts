@@ -492,6 +492,37 @@ class ZepchatUseCase {
       };
     }
   }
+
+  async getMyZepchats(userId: string) {
+    try {
+      if (!userId) {
+        return {
+          status: 400,
+          message: "Data not Found",
+        };
+      }
+
+      const zepchats = await this._zepchatRepository.fetchMyZepchats(userId);
+
+      if (zepchats) {
+        return {
+          status: 200,
+          data: zepchats,
+        };
+      }
+
+      return {
+        status: 400,
+        message: "Zepchats not Found",
+      };
+    } catch (error) {
+      console.error("An Error occured:", error);
+      return {
+        status: 500,
+        message: "Something Went Wrong",
+      };
+    }
+  }
 }
 
 export default ZepchatUseCase;

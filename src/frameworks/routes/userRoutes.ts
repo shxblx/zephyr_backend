@@ -10,6 +10,7 @@ import JWTToken from "../utils/generateToken";
 import errorHandle from "../middlewares/errorHandle";
 import upload from "../middlewares/multer";
 import userAuth from "../middlewares/userAuth";
+import GeminiChatbot from "../utils/geminiApi";
 
 const userRouter = express.Router();
 
@@ -19,6 +20,7 @@ const ecryptPassword = new EncryptPassword();
 const encryptOtp = new EncryptOtp();
 const generateMail = new sendOtp();
 const jwtToken = new JWTToken();
+const geminiApi = new GeminiChatbot();
 
 //repositories
 const userRepository = new UserRepository();
@@ -30,7 +32,8 @@ const userCase = new UserUsecase(
   ecryptPassword,
   encryptOtp,
   generateMail,
-  jwtToken
+  jwtToken,
+  geminiApi
 );
 
 //controllers
@@ -99,6 +102,11 @@ userRouter.get("/getNotification/:userId", userAuth, (req, res, next) => {
 userRouter.patch("/clearNotifications", userAuth, (req, res, next) => {
   userController.clearNotifications(req, res, next);
 });
+
+userRouter.post("/chatWithBot", userAuth, (req, res, next) => {
+  userController.chatWithBot(req, res, next);
+});
+
 userRouter.use(errorHandle);
 
 export default userRouter;

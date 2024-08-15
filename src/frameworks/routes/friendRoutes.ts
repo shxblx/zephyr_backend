@@ -54,6 +54,14 @@ friendRouter.post("/reportUser", userAuth, (req, res, next) => {
   friendController.reportUser(req, res, next);
 });
 
+friendRouter.get("/findNearbyFriends", userAuth, (req, res, next) => {
+  friendController.findNearbyFriends(req, res, next);
+});
+
+friendRouter.post("/setUserLocation", userAuth, (req, res, next) => {
+  friendController.setUserLocation(req, res, next);
+});
+
 friendRouter.use(errorHandle);
 
 export default friendRouter;

@@ -208,6 +208,19 @@ class CommunityController {
       next(error);
     }
   }
+  async makeAdmin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, communityId } = req.body;
+      const changed = await this._commuityUsecase.makeAdmin(
+        userId,
+        communityId
+      );
+
+      return res.status(changed.status).json(changed.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default CommunityController;

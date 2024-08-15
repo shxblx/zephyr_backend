@@ -378,6 +378,29 @@ class CommunityUsecase {
       };
     }
   }
+  async makeAdmin(userId: string, communityId: string) {
+    try {
+      const admin = await this._communityRepository.makeAdmin(
+        userId,
+        communityId
+      );
+      if (admin) {
+        return {
+          status: 200,
+          message: "Success",
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
 }
 
 export default CommunityUsecase;

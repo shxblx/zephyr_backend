@@ -150,6 +150,37 @@ class FriendController {
       next(error);
     }
   }
+  async findNearbyFriends(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { latitude, longitude } = req.query;
+      const userId = req.query.userId as string;
+      const friends = await this._friendUsecase.findNearbyNonFriends(
+        userId,
+        latitude,
+        longitude
+      );
+      if (friends.status === 200) {
+        return res.status(friends.status).json(friends.data);
+      }
+      return res.status(friends.status).json(friends.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async setUserLocation(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, newLocation } = req.body;
+      const setLocation = await this._friendUsecase.setLocation(
+        userId,
+        newLocation.latitude,
+        newLocation.longitude
+      );
+      return;
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default FriendController;

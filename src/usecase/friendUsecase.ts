@@ -3,6 +3,7 @@ import FriendRepository from "../repository/friendRepository";
 import UserNotifications from "../entities/userNotification";
 import Friend from "../entities/friends";
 import mongoose from "mongoose";
+import UserLocation from "../entities/userLocation";
 
 class FriendUseCase {
   private _friendRepository: FriendRepository;
@@ -333,6 +334,68 @@ class FriendUseCase {
         message: "Something went wrong",
       };
     } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async setLocation(userId: string, latitude: number, longitude: number) {
+    try {
+      if (!userId || latitude === undefined || longitude === undefined) {
+        return {
+          status: 400,
+          message: "Invalid data provided",
+        };
+      }
+
+      const user = new mongoose.Types.ObjectId(userId);
+
+      const details: UserLocation = {
+        userId: user,
+        location: {
+          type: "Point",
+          coordinates: [longitude, latitude],
+        },
+      };
+
+      const setLocation = await this._friendRepository.saveLocation(details);
+      return {
+        status: 200,
+        message: "Location saved successfully",
+      };
+    } catch (error) {
+      console.error("Error in setLocation:", error);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async findNearbyNonFriends(
+    userId: string,
+    latitude: any,
+    longitude: any,
+  ) {
+    try {
+      await this.setLocation(userId, latitude, longitude);
+      console.log(userId, latitude, longitude);
+
+      const nearbyNonFriends =
+        await this._friendRepository.findNearbyNonFriends(
+          userId,
+          longitude,
+          latitude,
+        );
+
+      return {
+        status: 200,
+        data: nearbyNonFriends,
+      };
+    } catch (error) {
+      console.error("Error in findNearbyNonFriends:", error);
       return {
         status: 500,
         message: "Internal server error",

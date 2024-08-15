@@ -134,6 +134,20 @@ class ZepchatController {
       next(error);
     }
   }
+
+  async getMyZepchat(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.userId;
+      const zepchats = await this._zepchatUsecase.getMyZepchats(userId);
+
+      if (zepchats.status === 200) {
+        return res.status(zepchats.status).json(zepchats.data);
+      }
+      return res.status(zepchats.status).json(zepchats.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default ZepchatController;
