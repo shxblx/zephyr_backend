@@ -55,7 +55,7 @@ class UserUsecase {
       } else {
         return {
           status: 200,
-          message: "User does not exists",
+          message: "User does not exist",
         };
       }
     } catch (error) {
@@ -248,7 +248,7 @@ class UserUsecase {
       if (!user) {
         return {
           status: 400,
-          message: "User doesn't exist",
+          message: "User doesn't exists",
         };
       }
 
