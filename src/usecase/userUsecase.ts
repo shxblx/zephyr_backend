@@ -243,8 +243,11 @@ class UserUsecase {
 
   async verifyUser(email: string, password: string) {
     try {
+      console.log(email,password);
+      
       const user = await this._userRepository.findByEmail(email);
-
+      console.log(user);
+      
       if (!user) {
         return {
           status: 400,
