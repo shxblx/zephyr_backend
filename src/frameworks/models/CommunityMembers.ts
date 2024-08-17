@@ -24,7 +24,7 @@ const communityMemberSchema: Schema<CommunityMembers & Document> = new Schema({
             ref: 'User',
             required: true,
         },
-    },
+    },  
 }, {
     timestamps: true,
 });

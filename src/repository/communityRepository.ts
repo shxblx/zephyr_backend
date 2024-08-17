@@ -183,7 +183,7 @@ class CommunityRepository implements CommunityRepo {
 
   async getCommunityMembers(
     communityId: string
-  ): Promise<{ members: User[]; admin: User }> {
+  ): Promise<{ members: User[]; admin: User; memberCount: number }> {
     try {
       const communityMembers = await CommunityMemberModel.findOne({
         communityId,
@@ -199,8 +199,9 @@ class CommunityRepository implements CommunityRepo {
 
       const members = communityMembers.members.map((member) => member.userId);
       const admin = communityMembers.admin.userId;
+      const memberCount = members.length + 1;
 
-      return { members, admin };
+      return { members, admin, memberCount };
     } catch (error: any) {
       throw new Error(`Error fetching community members: ${error.message}`);
     }
