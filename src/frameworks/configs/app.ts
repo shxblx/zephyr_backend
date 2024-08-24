@@ -20,7 +20,7 @@ const app: Express = express();
 export const httpServer = http.createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: "https://zephyr-frontend.vercel.app",
+    origin: "http://localhost:5000",
     methods: ["GET", "POST"],
     credentials: true,
   },
