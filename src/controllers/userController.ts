@@ -73,11 +73,12 @@ class UserController {
       const loginVerified = await this._userUsecase.verifyUser(email, password);
 
       if (loginVerified.status === 200 && loginVerified.data) {
+        console.log("Setting cookie:", loginVerified.data);
         res.cookie("jwt", loginVerified.data.token, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
-          sameSite: "lax"
+          sameSite: "none"
         });
 
         return res.status(loginVerified.status).json(loginVerified.data);
