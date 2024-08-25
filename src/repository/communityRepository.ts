@@ -154,8 +154,6 @@ class CommunityRepository implements CommunityRepo {
             if (newAdmin) {
               community.admin.userId = newAdmin;
               await community.save();
-            } else {
-              throw new Error("No users left to assign as new admin");
             }
           }
         }
