@@ -134,25 +134,35 @@ class CommunityRepository implements CommunityRepo {
     try {
       const userObjectId = new mongoose.Types.ObjectId(userId);
       const communityObjectId = new mongoose.Types.ObjectId(communityId);
-
+  
       const community = await CommunityMemberModel.findOne({
         communityId: communityObjectId,
       });
-
+  
       if (!community) {
         throw new Error("Community not found");
       }
-
-      if (community.admin.userId.equals(userObjectId)) {
-        const newAdmin = community.members[0]?.userId;
-        if (newAdmin) {
-          community.admin.userId = newAdmin;
-          await community.save();
-        } else {
-          throw new Error("No users left to assign as new admin");
+  
+      if (community.admin && community.admin.userId) {
+        if (community.admin.userId.equals(userObjectId)) {
+          if (community.members.length === 0) {
+            await CommunityMemberModel.deleteOne({ communityId: communityObjectId });
+            await CommunityModel.deleteOne({ _id: communityObjectId });
+            return {status:200, message: "Community deleted as no members were left." };
+          } else {
+            const newAdmin = community.members[0]?.userId;
+            if (newAdmin) {
+              community.admin.userId = newAdmin;
+              await community.save();
+            } else {
+              throw new Error("No users left to assign as new admin");
+            }
+          }
         }
+      } else {
+        throw new Error("Community admin not found or invalid.");
       }
-
+  
       const result = await CommunityMemberModel.findOneAndUpdate(
         { communityId: communityObjectId },
         {
@@ -162,24 +172,26 @@ class CommunityRepository implements CommunityRepo {
         },
         { new: true }
       );
-
+  
       if (!result) {
         throw new Error("User was not removed from the community");
       }
-
+  
       const userRemoved = result.members.every(
         (member) => !member.userId.equals(userObjectId)
       );
       if (!userRemoved) {
         throw new Error("Failed to remove user from the community");
       }
-
+  
       return result;
     } catch (error) {
       console.error("Error in leaveCommunity:", error);
       throw error;
     }
   }
+  
+  
 
   async getCommunityMembers(
     communityId: string
