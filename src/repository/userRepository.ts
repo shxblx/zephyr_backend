@@ -8,6 +8,8 @@ import UserModel from "../frameworks/models/userModel";
 import UserRepo from "../usecase/interfaces/user/IuserRepo";
 import UserLocation from "../entities/userLocation";
 import UserLocationModel from "../frameworks/models/userLocationModel";
+import TicketModel from "../frameworks/models/ticketModel";
+import Ticket from "../entities/ticket";
 
 class UserRepository implements UserRepo {
   async findByEmail(email: string): Promise<User | null> {
@@ -120,6 +122,59 @@ class UserRepository implements UserRepo {
       ).exec();
     } catch (error) {
       console.error("Error clearing notifications:", error);
+      throw error;
+    }
+  }
+
+  async raiseTicket(
+    userId: string,
+    subject: string,
+    description: string
+  ): Promise<Ticket> {
+    try {
+      let objectId: mongoose.Types.ObjectId;
+
+      try {
+        objectId = new mongoose.Types.ObjectId(userId);
+      } catch (error) {
+        console.error("Invalid userId format:", userId);
+        throw new Error("Invalid userId format");
+      }
+
+      const newTicket = new TicketModel({
+        userId: objectId,
+        subject,
+        description,
+        status: "Pending",
+      });
+
+      const savedTicket = await newTicket.save();
+      return savedTicket.toObject() as Ticket;
+    } catch (error) {
+      console.error("Error raising ticket:", error);
+      throw error;
+    }
+  }
+
+  async fetchTickets(userId: string): Promise<Ticket[]> {
+    try {
+      let objectId: mongoose.Types.ObjectId;
+
+      try {
+        objectId = new mongoose.Types.ObjectId(userId);
+      } catch (error) {
+        console.error("Invalid userId format:", userId);
+        throw new Error("Invalid userId format");
+      }
+
+      const tickets = await TicketModel.find({ userId: objectId })
+        .sort({ createdAt: -1 })
+        .lean()
+        .exec();
+
+      return tickets as Ticket[];
+    } catch (error) {
+      console.error("Error fetching tickets:", error);
       throw error;
     }
   }

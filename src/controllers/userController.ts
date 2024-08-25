@@ -78,7 +78,7 @@ class UserController {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
-          sameSite: "none"
+          sameSite: "none",
         });
 
         return res.status(loginVerified.status).json(loginVerified.data);
@@ -273,6 +273,34 @@ class UserController {
         return res.status(answer.status).json(answer.data);
       }
       return res.status(answer.status).json(answer.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async raiseTicket(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, subject, description } = req.body;
+      const ticket = await this._userUsecase.createTicket(
+        userId,
+        subject,
+        description
+      );
+      return res.status(ticket.status).json(ticket.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getTickets(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("here");
+      const { userId } = req.params;
+      
+      const tickets = await this._userUsecase.fetchTickets(userId);
+      if (tickets.status === 200) {
+        return res.status(tickets.status).json(tickets.data);
+      }
+      return res.status(tickets.status).json(tickets.message);
     } catch (error) {
       next(error);
     }

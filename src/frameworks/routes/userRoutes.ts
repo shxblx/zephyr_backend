@@ -107,6 +107,13 @@ userRouter.post("/chatWithBot", userAuth, (req, res, next) => {
   userController.chatWithBot(req, res, next);
 });
 
+userRouter.post("/raiseTicket", userAuth, (req, res, next) => {
+  userController.raiseTicket(req, res, next);
+});
+userRouter.get("/fetchTickets/:userId", userAuth, (req, res, next) => {
+  userController.getTickets(req, res, next);
+});
+
 userRouter.use(errorHandle);
 
 export default userRouter;

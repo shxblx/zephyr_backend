@@ -650,6 +650,57 @@ class UserUsecase {
       };
     }
   }
+
+  async createTicket(userId: string, subject: string, description: string) {
+    try {
+      const ticket = await this._userRepository.raiseTicket(
+        userId,
+        subject,
+        description
+      );
+
+      if (ticket) {
+        return {
+          status: 200,
+          message: "Ticket Raised Successfully",
+        };
+      }
+      return {
+        status: 400,
+        message: "Something Went Wrong",
+      };
+    } catch (error) {
+      console.error("Error Raising ticket:", error);
+      return {
+        status: 500,
+        message: "An error occurred while fetching notifications",
+      };
+    }
+  }
+
+  async fetchTickets(userId: string) {
+    try {
+      const tickets = await this._userRepository.fetchTickets(userId);
+      if (!tickets) {
+        return {
+          status: 400,
+          message: "Something Went Wrong",
+        };
+      }
+      console.log(tickets);
+
+      return {
+        status: 200,
+        data: tickets,
+      };
+    } catch (error) {
+      console.error("Error fetching Tickets:", error);
+      return {
+        status: 500,
+        message: "An error occurred while fetching notifications",
+      };
+    }
+  }
 }
 
 export default UserUsecase;
