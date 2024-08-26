@@ -10,6 +10,9 @@ const TicketSchema: Schema = new Schema({
   description: { type: String, required: true },
   status: { type: String, default: "Open" },
   created: { type: Date, default: Date.now },
+  adminReplies: [{ 
+    Reply: { type: String }
+  }]
 });
 
 const TicketModel: Model<TicketModel> = mongoose.model<TicketModel>(

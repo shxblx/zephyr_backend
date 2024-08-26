@@ -251,6 +251,58 @@ class AdminUsecase {
       };
     }
   }
+  async getTickets() {
+    try {
+      const tickets = await this._adminRepository.fetchTickets();
+      console.log(tickets);
+
+      if (tickets) {
+        return {
+          status: 200,
+          data: tickets,
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internel Server error",
+      };
+    }
+  }
+
+  async updateTicket(
+    ticketId: string,
+    newStatus: string,
+    adminComments: string
+  ) {
+    try {
+      const updatedTicket = await this._adminRepository.updateTicket(
+        ticketId,
+        newStatus,
+        adminComments
+      );
+      if (!updatedTicket) {
+        return {
+          status: 400,
+          message: "Something went wrong",
+        };
+      }
+      return {
+        status: 200,
+        message: "Ticket Updated Successfully",
+      };
+    } catch (error) {
+      console.error("Error updating ticket:", error);
+      return {
+        status: 500,
+        message: "Internel Server error",
+      };
+    }
+  }
 }
 
 export default AdminUsecase;

@@ -6,6 +6,9 @@ interface Ticket {
   description: string;
   status: string;
   created: Date;
+  adminReplies: Array<{
+    Reply:string
+  }>;
 }
 
 export default Ticket

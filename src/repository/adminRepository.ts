@@ -1,10 +1,12 @@
 import Community from "../entities/community";
 import CommunityReports from "../entities/communityReport";
 import Reports from "../entities/reports";
+import Ticket from "../entities/ticket";
 import User from "../entities/user";
 import CommunityModel from "../frameworks/models/communityModel";
 import CommunityReportsModel from "../frameworks/models/communityReportModel";
 import ReportModel from "../frameworks/models/reportModel";
+import TicketModel from "../frameworks/models/ticketModel";
 import UserModel from "../frameworks/models/userModel";
 import AdminRepo from "../usecase/interfaces/admin/IadminRepo";
 
@@ -86,6 +88,49 @@ class AdminRepository implements AdminRepo {
       return reports;
     } catch (error) {
       console.error("Error in fetchReports:", error);
+      throw error;
+    }
+  }
+  async fetchTickets(): Promise<Ticket[]> {
+    try {
+      const tickets = await TicketModel.find()
+        .populate("userId", "userName")
+        .lean();
+
+      const ticketsWithUsername = tickets.map((ticket) => ({
+        ...ticket,
+        userName: ticket.userId ? (ticket.userId as any).userName : null,
+      }));
+
+      return ticketsWithUsername;
+    } catch (error) {
+      console.error("Error in fetchTickets:", error);
+      throw error;
+    }
+  }
+  async updateTicket(
+    ticketId: string,
+    newStatus: string,
+    adminReply: string
+  ): Promise<Ticket | null> {
+    try {
+      const updatedTicket = await TicketModel.findByIdAndUpdate(
+        ticketId,
+        {
+          $set: { status: newStatus },
+          $push: { adminReplies: { Reply: adminReply } },
+        },
+        { new: true, runValidators: true }
+      ).lean();
+
+      if (!updatedTicket) {
+        console.error("Ticket not found or update failed");
+        return null;
+      }
+
+      return updatedTicket as Ticket;
+    } catch (error) {
+      console.error("Error updating ticket:", error);
       throw error;
     }
   }

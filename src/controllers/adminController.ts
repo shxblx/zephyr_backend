@@ -87,7 +87,7 @@ class AdminController {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "development",
         expires: new Date(0),
-        sameSite: "strict",
+        sameSite: "none",
       });
 
       return res.status(200).json({ message: "Logout successful" });
@@ -148,6 +148,30 @@ class AdminController {
         return res.status(reports.status).json(reports.data);
       }
       return res.status(reports.status).json(reports.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getTickets(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tickets = await this._adminUsecase.getTickets();
+      if (tickets.status === 200) {
+        return res.status(tickets.status).json(tickets.data);
+      }
+      return res.status(tickets.status).json(tickets.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateTicket(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { ticketId, newStatus, adminComments } = req.body;
+      const tickets = await this._adminUsecase.updateTicket(
+        ticketId,
+        newStatus,
+        adminComments
+      );
+      return res.status(tickets.status).json(tickets.message);
     } catch (error) {
       next(error);
     }

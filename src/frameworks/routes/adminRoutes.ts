@@ -5,8 +5,7 @@ import AdminController from "../../controllers/adminController";
 import EncryptPassword from "../utils/bcryptPassword";
 import JWTToken from "../utils/generateToken";
 import errorHandle from "../middlewares/errorHandle";
-import adminAuth from "../middlewares/adminAuth"; // Import middleware
-import userAuth from "../middlewares/userAuth";
+import adminAuth from "../middlewares/adminAuth";
 
 const adminRouter = express.Router();
 
@@ -50,15 +49,23 @@ adminRouter.post("/unbanCommunity", adminAuth, (req, res, next) => {
   adminController.unbanCommunity(req, res, next);
 });
 
-adminRouter.get("/getUserInfo/:userId", userAuth, (req, res, next) => {
+adminRouter.get("/getUserInfo/:userId", adminAuth, (req, res, next) => {
   adminController.getUserInfo(req, res, next);
 });
-adminRouter.get("/getReports", userAuth, (req, res, next) => {
+adminRouter.get("/getReports", adminAuth, (req, res, next) => {
   adminController.getReports(req, res, next);
 });
-adminRouter.get("/getCommunityReports", userAuth, (req, res, next) => {
+adminRouter.get("/getCommunityReports", adminAuth, (req, res, next) => {
   adminController.getCommunityReports(req, res, next);
 });
+adminRouter.get("/getTickets", adminAuth, (req, res, next) => {
+  adminController.getTickets(req, res, next);
+});
+adminRouter.post("/updateTicket", adminAuth, (req, res, next) => {
+  adminController.updateTicket(req, res, next);
+});
+
+
 
 adminRouter.use(errorHandle);
 

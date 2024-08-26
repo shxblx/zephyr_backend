@@ -146,6 +146,8 @@ class UserRepository implements UserRepo {
         subject,
         description,
         status: "Pending",
+        created: new Date(),
+        adminReplies: [],
       });
 
       const savedTicket = await newTicket.save();
@@ -168,7 +170,7 @@ class UserRepository implements UserRepo {
       }
 
       const tickets = await TicketModel.find({ userId: objectId })
-        .sort({ createdAt: -1 })
+        .sort({ created: -1 })
         .lean()
         .exec();
 
