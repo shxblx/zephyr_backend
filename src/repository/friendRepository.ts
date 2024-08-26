@@ -462,7 +462,7 @@ class FriendRepository implements FriendRepo {
     longitude: number,
     latitude: number,
     maxDistance: number = 5000,
-    limit: number = 10 
+    limit: number = 10
   ): Promise<UserLocation[]> {
     try {
       const currentUserFriends = await FriendModel.findOne({ userId: userId })
