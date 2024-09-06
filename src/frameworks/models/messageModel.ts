@@ -23,15 +23,8 @@ const messageSchema: Schema<MessageDocument> = new Schema(
       type: Date,
       default: Date.now,
     },
-    fileUrl: {
-      type: String,
-      required: false,
-    },
-    fileType: {
-      type: String,
-      enum: ["image", "video"],
-      required: false,
-    },
+    fileUrl: { type: String },
+    fileType: { type: String, enum: ["image", "video"] },
   },
   {
     timestamps: true,

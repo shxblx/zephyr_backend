@@ -363,15 +363,24 @@ class FriendRepository implements FriendRepo {
     fileType?: "image" | "video"
   ): Promise<any> {
     try {
-      const newMessage = new MessageModel({
+      const messageData: any = {
         conversationId: new mongoose.Types.ObjectId(conversationId),
         sender: new mongoose.Types.ObjectId(senderId),
         content: content.trim() || " ",
-        fileUrl: fileUrl,
-        fileType: fileType,
-      });
+      };
+
+      if (fileUrl) {
+        messageData.fileUrl = fileUrl;
+      }
+
+      if (fileType) {
+        messageData.fileType = fileType;
+      }
+
+      const newMessage = new MessageModel(messageData);
 
       const savedMessage = await newMessage.save();
+      console.log("Saved message:", savedMessage);
 
       await conversationModel.findByIdAndUpdate(conversationId, {
         $set: { updatedAt: new Date() },
