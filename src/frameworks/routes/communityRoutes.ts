@@ -86,7 +86,14 @@ communityRouter.post("/addMembertoTheCommunity", userAuth, (req, res, next) => {
   communityController.addMembertoTheCommunity(req, res, next);
 });
 
-
+communityRouter.post(
+  "/sendFileToCommunity",
+  upload.single("selectedFile"),
+  userAuth,
+  (req, res, next) => {
+    communityController.sendFileToCommunity(req, res, next);
+  }
+);
 
 communityRouter.use(errorHandle);
 

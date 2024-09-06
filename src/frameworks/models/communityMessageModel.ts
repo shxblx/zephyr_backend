@@ -29,6 +29,8 @@ const communityMessageSchema: Schema<CommunityMessage & Document> = new Schema(
       type: Date,
       default: Date.now,
     },
+    fileUrl: { type: String },
+    fileType: { type: String, enum: ["image", "video"] },
   },
   {
     timestamps: true,

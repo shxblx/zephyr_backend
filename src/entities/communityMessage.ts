@@ -7,6 +7,8 @@ interface CommunityMessage {
   userName: string;
   content: string;
   timestamp?: Date;
+  fileUrl?: string;
+  fileType?: "image" | "video";
 }
 
 export default CommunityMessage;

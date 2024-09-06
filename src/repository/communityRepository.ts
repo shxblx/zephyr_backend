@@ -256,7 +256,9 @@ class CommunityRepository implements CommunityRepo {
     sender: string,
     userName: string,
     profilePicture: string,
-    content: string
+    content: string,
+    fileUrl?: string,
+    fileType?: "image" | "video"
   ): Promise<CommunityMessage> {
     try {
       const newMessage = new CommunityMessageModel({
@@ -264,9 +266,11 @@ class CommunityRepository implements CommunityRepo {
         sender: new mongoose.Types.ObjectId(sender),
         userName,
         profilePicture,
-        content,
+        content: content || " ",
+        fileUrl,
+        fileType,
       });
-
+  
       const savedMessage = await newMessage.save();
       return savedMessage;
     } catch (error) {
@@ -388,8 +392,6 @@ class CommunityRepository implements CommunityRepo {
       throw error;
     }
   }
-
-  
 }
 
 export default CommunityRepository;

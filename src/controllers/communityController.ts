@@ -146,15 +146,24 @@ class CommunityController {
 
   async sendCommunityMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      const { communityId, sender, userName, profilePicture, content } =
-        req.body;
+      const {
+        communityId,
+        sender,
+        userName,
+        profilePicture,
+        content,
+        fileUrl,
+        fileType,
+      } = req.body;
 
       const message = await this._commuityUsecase.sendCommunityMessage(
         communityId,
         sender,
         userName,
         profilePicture,
-        content
+        content,
+        fileUrl,
+        fileType
       );
 
       return res.status(message.status).json(message.message);
@@ -234,6 +243,24 @@ class CommunityController {
       );
 
       return res.status(added.status).json(added.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async sendFileToCommunity(req: Request, res: Response, next: NextFunction) {
+    try {
+      const selectedFile = req.file;
+      if (!selectedFile) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      const fileSend = await this._commuityUsecase.sendFileToCommunity(
+        selectedFile
+      );
+      if (fileSend.status === 200) {
+        return res.status(fileSend.status).json({ fileUrl: fileSend.fileUrl });
+      }
+      return res.status(fileSend.status).json({ message: fileSend.message });
     } catch (error) {
       next(error);
     }

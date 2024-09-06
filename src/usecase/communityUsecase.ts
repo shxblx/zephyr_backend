@@ -230,13 +230,21 @@ class CommunityUsecase {
     sender: string,
     userName: string,
     profilePicture: string,
-    content: string
+    content: string,
+    fileUrl?: string,
+    fileType?: "image" | "video"
   ) {
     try {
-      if (!communityId || !sender || !userName || !profilePicture || !content) {
+      if (
+        !communityId ||
+        !sender ||
+        !userName ||
+        !profilePicture ||
+        (!content && !fileUrl)
+      ) {
         return {
           status: 400,
-          message: "Data Not Found",
+          message: "Invalid data",
         };
       }
 
@@ -245,7 +253,9 @@ class CommunityUsecase {
         sender,
         userName,
         profilePicture,
-        content
+        content.trim() || " ",
+        fileUrl,
+        fileType
       );
 
       if (message) {
@@ -418,6 +428,37 @@ class CommunityUsecase {
         message: "Something went wrong",
       };
     } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async sendFileToCommunity(selectedFile: Express.Multer.File) {
+    try {
+      const base64File = selectedFile.buffer.toString("base64");
+      const dataURI = `data:${selectedFile.mimetype};base64,${base64File}`;
+
+      const uploadResult = await cloudinary.uploader.upload(dataURI, {
+        resource_type: "auto",
+      });
+
+      const fileUrl = uploadResult.secure_url;
+      if (!fileUrl) {
+        return {
+          status: 400,
+          message: "Something went wrong",
+        };
+      }
+      console.log("fileUrl", fileUrl);
+      return {
+        status: 200,
+        fileUrl: fileUrl,
+        message: "File Upload Success",
+      };
+    } catch (error) {
+      console.error("Error in findNearbyNonFriends:", error);
       return {
         status: 500,
         message: "Internal server error",
