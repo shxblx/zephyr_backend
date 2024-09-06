@@ -181,6 +181,24 @@ class FriendController {
       next(error);
     }
   }
+
+  async sendFiletoFriends(req: Request, res: Response, next: NextFunction) {
+    try {
+      const selectedFile = req.file;
+      if (!selectedFile) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      const fileSend = await this._friendUsecase.sendFiletoFriends(
+        selectedFile
+      );
+      if (fileSend.status === 200) {
+        return res.status(fileSend.status).json({ fileUrl: fileSend.fileUrl });
+      }
+      return res.status(fileSend.status).json({ message: fileSend.message });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default FriendController;

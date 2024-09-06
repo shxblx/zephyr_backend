@@ -4,6 +4,7 @@ import UserNotifications from "../entities/userNotification";
 import Friend from "../entities/friends";
 import mongoose from "mongoose";
 import UserLocation from "../entities/userLocation";
+import cloudinary from "../frameworks/utils/cloudinaryConfig";
 
 class FriendUseCase {
   private _friendRepository: FriendRepository;
@@ -212,12 +213,18 @@ class FriendUseCase {
     }
   }
 
-  async sendMessage(senderId: string, receiverId: string, content: string) {
+  async sendMessage(
+    senderId: string,
+    receiverId: string,
+    content: string,
+    fileUrl?: string,
+    fileType?: "image" | "video"
+  ) {
     try {
-      if (!senderId || !receiverId || !content) {
+      if (!senderId || !receiverId || (!content && !fileUrl)) {
         return {
           status: 400,
-          message: "Data Not Found",
+          message: "Invalid data provided",
         };
       }
 
@@ -232,13 +239,16 @@ class FriendUseCase {
         const message = await this._friendRepository.sendMessage(
           conversationId,
           senderId,
-          content
+          content,
+          fileUrl,
+          fileType
         );
 
         if (message) {
           return {
             status: 200,
             message: "Message sent successfully",
+            data: message,
           };
         }
       }
@@ -247,6 +257,7 @@ class FriendUseCase {
         message: "Something went wrong",
       };
     } catch (error) {
+      console.error("Error in sendMessage:", error);
       return {
         status: 500,
         message: "Internal server error",
@@ -374,11 +385,7 @@ class FriendUseCase {
     }
   }
 
-  async findNearbyNonFriends(
-    userId: string,
-    latitude: any,
-    longitude: any,
-  ) {
+  async findNearbyNonFriends(userId: string, latitude: any, longitude: any) {
     try {
       await this.setLocation(userId, latitude, longitude);
       console.log(userId, latitude, longitude);
@@ -387,12 +394,43 @@ class FriendUseCase {
         await this._friendRepository.findNearbyNonFriends(
           userId,
           longitude,
-          latitude,
+          latitude
         );
 
       return {
         status: 200,
         data: nearbyNonFriends,
+      };
+    } catch (error) {
+      console.error("Error in findNearbyNonFriends:", error);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async sendFiletoFriends(selectedFile: Express.Multer.File) {
+    try {
+      const base64File = selectedFile.buffer.toString("base64");
+      const dataURI = `data:${selectedFile.mimetype};base64,${base64File}`;
+
+      const uploadResult = await cloudinary.uploader.upload(dataURI, {
+        resource_type: "auto",
+      });
+
+      const fileUrl = uploadResult.secure_url;
+      if (!fileUrl) {
+        return {
+          status: 400,
+          message: "Something went wrong",
+        };
+      }
+      console.log("fileUrl", fileUrl);
+      return {
+        status: 200,
+        fileUrl: fileUrl,
+        message: "File Upload Success",
       };
     } catch (error) {
       console.error("Error in findNearbyNonFriends:", error);

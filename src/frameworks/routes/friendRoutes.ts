@@ -4,6 +4,7 @@ import FriendController from "../../controllers/friendController";
 import FriendRepository from "../../repository/friendRepository";
 import errorHandle from "../middlewares/errorHandle";
 import userAuth from "../middlewares/userAuth";
+import upload from "../middlewares/multer";
 
 const friendRouter = express.Router();
 
@@ -61,6 +62,15 @@ friendRouter.get("/findNearbyFriends", userAuth, (req, res, next) => {
 friendRouter.post("/setUserLocation", userAuth, (req, res, next) => {
   friendController.setUserLocation(req, res, next);
 });
+
+friendRouter.post(
+  "/sendFiletoFriends",
+  upload.single("selectedFile"), 
+  userAuth,
+  (req, res, next) => {
+    friendController.sendFiletoFriends(req, res, next);
+  }
+);
 
 friendRouter.use(errorHandle);
 

@@ -5,6 +5,8 @@ interface Message {
   sender: mongoose.Types.ObjectId | string;
   content: string;
   timestamp?: Date;
+  fileUrl?: string;
+  fileType?: "image" | "video";
 }
 
 export default Message;

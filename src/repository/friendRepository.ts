@@ -358,13 +358,17 @@ class FriendRepository implements FriendRepo {
   async sendMessage(
     conversationId: mongoose.Types.ObjectId,
     senderId: string,
-    content: string
+    content: string,
+    fileUrl?: string,
+    fileType?: "image" | "video"
   ): Promise<any> {
     try {
       const newMessage = new MessageModel({
         conversationId: new mongoose.Types.ObjectId(conversationId),
         sender: new mongoose.Types.ObjectId(senderId),
         content: content,
+        fileUrl: fileUrl,
+        fileType: fileType,
       });
 
       const savedMessage = await newMessage.save();
