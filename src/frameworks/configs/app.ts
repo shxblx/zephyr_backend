@@ -23,7 +23,7 @@ const app: Express = express();
 export const httpServer = http.createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: "https://zephyrforgamer.vercel.app",
+    origin: "http://localhost:5000",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://zephyrforgamer.vercel.app",
+    origin: "http://localhost:5000",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
