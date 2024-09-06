@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { Server as SocketIOServer } from "socket.io";
-
 import http from "http";
 
 //Routes
@@ -23,7 +22,7 @@ const app: Express = express();
 export const httpServer = http.createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: "http://localhost:5000",
+    origin: "https://zephyrforgamer.vercel.app",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -35,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5000",
+    origin: "https://zephyrforgamer.vercel.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
