@@ -36,14 +36,24 @@ class UserUsecase {
     this._geminiApi = geminiApi;
   }
 
-  async checkExist(email: string, userName: string) {
+  async checkExist(email: string, userName?: string) {
     try {
       const userExist = await this._userRepository.findByEmail(email);
-      const userNameExist = await this._userRepository.findUserName(userName);
-      if (userNameExist) {
+      if (userName) {
+        const userNameExist = await this._userRepository.findUserName(userName);
+        if (userNameExist) {
+          return {
+            status: 400,
+            message: "Username already taken",
+          };
+        }
+      }
+      const user = await this._userRepository.findByEmail(email);
+
+      if (user?.isBlocked === true) {
         return {
           status: 400,
-          message: "Username already taken",
+          message: "Unauthorized Access",
         };
       }
 
@@ -692,6 +702,35 @@ class UserUsecase {
       return {
         status: 200,
         data: tickets,
+      };
+    } catch (error) {
+      console.error("Error fetching Tickets:", error);
+      return {
+        status: 500,
+        message: "An error occurred while fetching notifications",
+      };
+    }
+  }
+
+  async checkBlocked(email: string) {
+    try {
+      const user = await this._userRepository.findByEmail(email);
+      if (!user) {
+        return {
+          status: 400,
+          message: "User doesn't exists",
+        };
+      }
+      if (user.isBlocked === true) {
+        return {
+          status: 400,
+          message: "Unauthorized Access",
+        };
+      }
+
+      return {
+        status: 200,
+        message: "Success",
       };
     } catch (error) {
       console.error("Error fetching Tickets:", error);

@@ -82,6 +82,10 @@ communityRouter.post("/makeAdmin", userAuth, (req, res, next) => {
   communityController.makeAdmin(req, res, next);
 });
 
+communityRouter.post("/addMembertoTheCommunity", userAuth, (req, res, next) => {
+  communityController.addMembertoTheCommunity(req, res, next);
+});
+
 
 
 communityRouter.use(errorHandle);

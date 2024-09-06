@@ -401,6 +401,29 @@ class CommunityUsecase {
       };
     }
   }
+  async addMembertoTheCommunity(userId: string, communityId: string) {
+    try {
+      const added = await this._communityRepository.addMemberToCommunity(
+        communityId,
+        userId
+      );
+      if (added) {
+        return {
+          status: 200,
+          message: "Success",
+        };
+      }
+      return {
+        status: 400,
+        message: "Something went wrong",
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
 }
 
 export default CommunityUsecase;

@@ -113,6 +113,10 @@ class UserController {
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
+      const exist = await this._userUsecase.checkBlocked(email);
+      if (exist.status === 400) {
+        return res.status(400).json(exist.message);
+      }
       const otpSent = await this._userUsecase.resendOtp(email);
       if (otpSent.status === 200 && otpSent.data) {
         return res.status(otpSent.status).json(otpSent.data);
@@ -133,6 +137,7 @@ class UserController {
         return res.status(400).json({ message: "OTP and email are required" });
       }
       const isVerified = await this._userUsecase.verifyForgot(email, otp);
+      console.log(isVerified);
 
       return res.status(isVerified.status).json(isVerified.data);
     } catch (error) {
@@ -295,7 +300,7 @@ class UserController {
     try {
       console.log("here");
       const { userId } = req.params;
-      
+
       const tickets = await this._userUsecase.fetchTickets(userId);
       if (tickets.status === 200) {
         return res.status(tickets.status).json(tickets.data);

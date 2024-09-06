@@ -221,6 +221,23 @@ class CommunityController {
       next(error);
     }
   }
+  async addMembertoTheCommunity(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { userId, communityId } = req.body;
+      const added = await this._commuityUsecase.addMembertoTheCommunity(
+        userId,
+        communityId
+      );
+
+      return res.status(added.status).json(added.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default CommunityController;
