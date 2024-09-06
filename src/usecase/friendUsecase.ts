@@ -221,7 +221,7 @@ class FriendUseCase {
     fileType?: "image" | "video"
   ) {
     try {
-      if (!senderId || !receiverId || (!content && !fileUrl)) {
+      if (!senderId || !receiverId || (!content.trim() && !fileUrl)) {
         return {
           status: 400,
           message: "Invalid data provided",
@@ -239,7 +239,7 @@ class FriendUseCase {
         const message = await this._friendRepository.sendMessage(
           conversationId,
           senderId,
-          content,
+          content.trim() || " ",
           fileUrl,
           fileType
         );

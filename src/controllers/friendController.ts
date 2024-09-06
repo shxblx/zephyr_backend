@@ -101,11 +101,13 @@ class FriendController {
   }
   async sendMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      const { senderId, receiverId, content } = req.body;
+      const { senderId, receiverId, content, fileUrl, fileType } = req.body;
       const messageSend = await this._friendUsecase.sendMessage(
         senderId,
         receiverId,
-        content
+        content,
+        fileUrl,
+        fileType
       );
 
       return res.status(messageSend.status).json(messageSend.message);

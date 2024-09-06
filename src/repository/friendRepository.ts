@@ -366,7 +366,7 @@ class FriendRepository implements FriendRepo {
       const newMessage = new MessageModel({
         conversationId: new mongoose.Types.ObjectId(conversationId),
         sender: new mongoose.Types.ObjectId(senderId),
-        content: content,
+        content: content.trim() || " ",
         fileUrl: fileUrl,
         fileType: fileType,
       });
