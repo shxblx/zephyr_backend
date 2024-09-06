@@ -1,6 +1,7 @@
 import CommunityRepository from "../repository/communityRepository";
 import cloudinary from "../frameworks/utils/cloudinaryConfig";
 import mongoose from "mongoose";
+import UserNotifications from "../entities/userNotification";
 
 class CommunityUsecase {
   private _communityRepository: CommunityRepository;
@@ -257,6 +258,36 @@ class CommunityUsecase {
         fileUrl,
         fileType
       );
+
+      const notificationContent = content
+        ? content
+        : "You have received a media";
+
+      const user = await this._communityRepository.findById(sender);
+      const community = await this._communityRepository.getCommunityById(
+        communityId
+      );
+      const communityMembers =
+        await this._communityRepository.getCommunityMembers(communityId);
+
+      const notification = {
+        category: "community",
+        _id: new mongoose.Types.ObjectId(communityId),
+        message: `${notificationContent} from ${user?.userName} in ${community?.name}`,
+        profile: user?.profilePicture,
+        type: "communityMessage",
+        timestamp: new Date(),
+      };
+
+      for (const member of communityMembers.members) {
+        const memberUserId = member?._id;
+        if (memberUserId) {
+          await this._communityRepository.addNotification(
+            memberUserId.toString(),
+            notification
+          );
+        }
+      }
 
       if (message) {
         return {

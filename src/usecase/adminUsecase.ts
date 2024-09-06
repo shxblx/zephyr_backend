@@ -273,6 +273,34 @@ class AdminUsecase {
       };
     }
   }
+  async getDashboardData() {
+    try {
+      const users = await this._adminRepository.getUsers();
+      const communities = await this._adminRepository.fetchCommunities();
+      const reports = await this._adminRepository.fetchReports();
+
+      if (!users || !communities || !reports) {
+        return {
+          status: 400,
+          message: "Data not found",
+        };
+      }
+
+      return {
+        status: 200,
+        data: {
+          users,
+          communities,
+          reports,
+        },
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internel Server error",
+      };
+    }
+  }
 
   async updateTicket(
     ticketId: string,

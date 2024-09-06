@@ -244,6 +244,22 @@ class FriendUseCase {
           fileType
         );
 
+        const notificationContent = content
+          ? content
+          : "You have recieved a media";
+
+        const user = await this._friendRepository.findById(senderId);
+
+        const notification: UserNotifications["notifications"][0] = {
+          category: "friends",
+          _id: new mongoose.Types.ObjectId(senderId),
+          message: `${notificationContent} from ${user?.userName}`,
+          profile: user?.profilePicture,
+          type: "friendMessage",
+          timestamp: new Date(),
+        };
+        await this._friendRepository.addNotification(receiverId, notification);
+
         if (message) {
           return {
             status: 200,

@@ -130,11 +130,14 @@ class UserUsecase {
         displayName: string;
         password: string;
         email: string;
+        profilePicture: string;
       } = {
         userName: otpData.userName,
         displayName: otpData.displayName,
         password: otpData.password,
         email: otpData.email,
+        profilePicture:
+          "https://res.cloudinary.com/dsm0j8tzn/image/upload/v1721391389/ohoimzefn5yhkfjhbs14.jpg",
       };
 
       const now = new Date().getTime();

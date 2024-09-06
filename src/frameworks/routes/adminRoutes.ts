@@ -61,11 +61,12 @@ adminRouter.get("/getCommunityReports", adminAuth, (req, res, next) => {
 adminRouter.get("/getTickets", adminAuth, (req, res, next) => {
   adminController.getTickets(req, res, next);
 });
+adminRouter.get("/getDashboardData", adminAuth, (req, res, next) => {
+  adminController.getDashboardData(req, res, next);
+});
 adminRouter.post("/updateTicket", adminAuth, (req, res, next) => {
   adminController.updateTicket(req, res, next);
 });
-
-
 
 adminRouter.use(errorHandle);
 

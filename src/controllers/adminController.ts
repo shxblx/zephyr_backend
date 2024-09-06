@@ -163,6 +163,17 @@ class AdminController {
       next(error);
     }
   }
+  async getDashboardData(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await this._adminUsecase.getDashboardData();
+      if (data.status === 200) {
+        return res.status(data.status).json(data.data);
+      }
+      return res.status(data.status).json(data.message);
+    } catch (error) {
+      next(error);
+    }
+  }
   async updateTicket(req: Request, res: Response, next: NextFunction) {
     try {
       const { ticketId, newStatus, adminComments } = req.body;

@@ -33,7 +33,7 @@ class UserRepository implements UserRepo {
     otp: string,
     userName?: string,
     displayName?: string,
-    password?: string
+    password?: string,
   ): Promise<any> {
     const filter = { email };
     const update: any = {

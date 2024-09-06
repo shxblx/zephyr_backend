@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import ZepchatRepository from "../repository/zepchatRepository";
 import Zepchat from "../entities/zepChat";
 import ZepReply from "../entities/zepReply";
+import UserNotifications from "../entities/userNotification";
 
 class ZepchatUseCase {
   private _zepchatRepository: ZepchatRepository;
@@ -98,7 +99,6 @@ class ZepchatUseCase {
   async postReply(zepChatId: string, userId: string, content: string) {
     try {
       if (!zepChatId || !content || !userId) {
-        
         return {
           status: 400,
           message: "Data Not Found",
@@ -119,6 +119,22 @@ class ZepchatUseCase {
           message: "User Not Found",
         };
       }
+
+      const zepchat = await this._zepchatRepository.fetchZepchatById(zepChatId);
+      const author = zepchat?.author._id as unknown as string;
+      const zepUser = await this._zepchatRepository.findUserById(author);
+
+      const notificationContent = `${user.userName} replied on your zepchat "${zepchat?.title}"`;
+
+      const notification: UserNotifications["notifications"][0] = {
+        category: "zepchats",
+        _id: new mongoose.Types.ObjectId(userId),
+        message: `${notificationContent} : ${content}`,
+        profile: user?.profilePicture,
+        type: "zepchatReply",
+        timestamp: new Date(),
+      };
+      await this._zepchatRepository.addNotification(author, notification);
 
       const zepReply: ZepReply = {
         content,

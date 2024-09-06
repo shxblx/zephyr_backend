@@ -5,6 +5,8 @@ import UserModel from "../frameworks/models/userModel";
 import ZepReply from "../entities/zepReply";
 import ZepReplyModel from "../frameworks/models/zepReplyModel";
 import ZepchatModel from "../frameworks/models/zepchatModel";
+import UserNotificationsModel from "../frameworks/models/UserNotificationsModel";
+import mongoose from "mongoose";
 
 class ZepchatRepository {
   async createZepchat(zepchatData: Zepchat): Promise<Zepchat> {
@@ -32,6 +34,23 @@ class ZepchatRepository {
       return user;
     } catch (error) {
       console.error("Error finding user by ID:", error);
+      throw error;
+    }
+  }
+
+  async addNotification(userId: string, notification: any): Promise<void> {
+    try {
+      await UserNotificationsModel.findOneAndUpdate(
+        { userId: new mongoose.Types.ObjectId(userId) },
+        {
+          $push: {
+            notifications: notification,
+          },
+        },
+        { upsert: true, new: true }
+      );
+    } catch (error) {
+      console.error("Error in addNotification:", error);
       throw error;
     }
   }

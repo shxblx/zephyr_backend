@@ -10,6 +10,7 @@ import CommunityMessageModel from "../frameworks/models/communityMessageModel";
 import UserModel from "../frameworks/models/userModel";
 import CommunityReports from "../entities/communityReport";
 import CommunityReportsModel from "../frameworks/models/communityReportModel";
+import UserNotificationsModel from "../frameworks/models/UserNotificationsModel";
 
 class CommunityRepository implements CommunityRepo {
   async createCommunity(communityData: Community): Promise<any> {
@@ -226,6 +227,23 @@ class CommunityRepository implements CommunityRepo {
       return community;
     } catch (error: any) {
       throw new Error(`Error fetching community members: ${error.message}`);
+    }
+  }
+
+  async addNotification(userId: string, notification: any): Promise<void> {
+    try {
+      await UserNotificationsModel.findOneAndUpdate(
+        { userId: new mongoose.Types.ObjectId(userId) },
+        {
+          $push: {
+            notifications: notification,
+          },
+        },
+        { upsert: true, new: true }
+      );
+    } catch (error) {
+      console.error("Error in addNotification:", error);
+      throw error;
     }
   }
 
