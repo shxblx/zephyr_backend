@@ -34,12 +34,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://zephyrforgamer.vercel.app",
+    origin: "https://zephyrforgamer.vercel.app/",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
 );
-
+//https://zephyrforgamer.vercel.app
 // Routes
 app.use("/user", userRouter);
 app.use("/user", friendRouter);
