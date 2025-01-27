@@ -1,11 +1,9 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js",
-    "build": "tsc",
-    "vercel-build": "tsc"
+    "start": "nodemon --exec ts-node-dev src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -41,7 +39,6 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
     "@typescript-eslint/parser": "^7.15.0",
-    "@vercel/node": "^5.0.2",
     "eslint": "^8.57.0",
     "globals": "^15.8.0",
     "typescript": "^5.5.3",
