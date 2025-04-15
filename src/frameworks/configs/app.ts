@@ -24,7 +24,7 @@ const io = new SocketIOServer(httpServer, {
   cors: {
     origin: [
       "http://localhost:5000",
-      "https://zephyr-backend-hwx8.onrender.com",
+      "https://zephyrforgamer.vercel.app",
     ],
     methods: ["GET", "POST"],
     credentials: true,
