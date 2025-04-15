@@ -31,7 +31,10 @@
     "nodemon": "^3.1.4",
     "socket.io": "^4.7.5",
     "ts-node-dev": "^2.0.0",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "gopd": "^2.0.1",
+    "get-intrinsic": "^1.2.2",
+    "qs": "6.11.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.6.0",
