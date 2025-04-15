@@ -16,16 +16,10 @@ dotenv.config();
 
 const app: Express = express();
 
-// http://localhost:5000
-// https://zephyrforgamer.vercel.app
-
 export const httpServer = http.createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: [
-      "http://localhost:5000",
-      "https://zephyrforgamer.vercel.app",
-    ],
+    origin: "https://zephyrforgamer.vercel.app",
     methods: ["GET", "POST"],
     credentials: true,
   },
