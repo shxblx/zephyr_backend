@@ -22,7 +22,10 @@ const app: Express = express();
 export const httpServer = http.createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: "http://localhost:5000",
+    origin: [
+      "http://localhost:5000",
+      "https://zephyr-backend-hwx8.onrender.com",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
