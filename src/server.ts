@@ -7,5 +7,5 @@ const app = httpServer;
 const PORT = process.env.PORT || 3030;
 
 app.listen(PORT, () => {
-  console.log("server started running");
+  console.log(`server started running on port ${PORT}`);
 });

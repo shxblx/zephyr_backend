@@ -39,6 +39,11 @@ app.use(
 );
 //https://zephyrforgamer.vercel.app
 // Routes
+
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
 app.use("/user", userRouter);
 app.use("/user", friendRouter);
 app.use("/user", communityRouter);
